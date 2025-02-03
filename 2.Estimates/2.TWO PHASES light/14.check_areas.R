@@ -1,14 +1,19 @@
 library(dplyr)
 library(readxl)
+library(stringr)
 # read file of estimates
 # setwd("C:/Users/UTENTE/Desktop/Progetto_LUCAS/Task1")
 setwd("D:/Google Drive/LUCAS 2025/Task 1 - ESTIMATES/2.TWO PHASES light/")
+# read area file:
+areas = read.csv("areas_2015_2024.csv")
 load("countries.RData")
 setwd("D:/Google Drive/LUCAS 2025/Task 1 - ESTIMATES/2.TWO PHASES light/tables_country")
 
-check=data.frame(matrix(nrow=length(countries), ncol=5))
-colnames(check)=c("Country", "LC-2digits", "LC-3digits, LU-2digits", "LU-3digits")
+check=data.frame(matrix(nrow=length(countries), ncol=6))
+colnames(check)=c("Country", "LC-2digits", "LC-3digits","LU-2digits", "LU-3digits", "area")
 check$Country=countries
+
+
 # for each country
 for (j in 1:length(countries)){
   country=countries[j]
@@ -19,10 +24,16 @@ for (j in 1:length(countries)){
   estimates=estimates[,c(1,((ncol(estimates)-4):ncol(estimates)))]
   colnames(estimates)=c("Variable", "Area", "Std_error", "CI_lower", "CI_upper", "CV" )
   
+  # select only area variable
+  areas_estimates=estimates  %>% filter(grepl(pattern="area", Variable)) 
+  
+  # select only country's most updated areas: 
+  areas_c= areas %>% filter(str_detect(string=NUTS2, pattern=paste0("^", country))) %>% select(area2024)
   
   # select only SURVEY_LC1, SURVEY_LU1
   estimates= estimates %>% filter(grepl(pattern="SURVEY_LC1|SURVEY_LU1", Variable)) 
   
+  # comparison between LC1 and LC2, LC3: 
   # Land Cover
   LC=estimates$Variable[startsWith(prefix="SURVEY_LC1", estimates$Variable)]
   LC1digit=LC[nchar(LC)==13]
@@ -61,6 +72,7 @@ for (j in 1:length(countries)){
   
   check[j,2:3]=c(all(check_boolean_LC2d),all(check_boolean_LC3d))
   
+  # comparison between LU1 and LU2, LU3: 
   # Land Use
   LU=estimates$Variable[startsWith(prefix="SURVEY_LU1", estimates$Variable)]
   LU1digit=LU[nchar(LU)==14]
@@ -98,4 +110,9 @@ for (j in 1:length(countries)){
   print(paste(country, "- Check LU 3 digits:",all(check_boolean_LU3d)))
   
   check[j,4:5]=c(all(check_boolean_LU2d),all(check_boolean_LU3d))
+  
+  # comparison between areas
+  check_boolean_areas=round(areas_estimates$Area, 6)==round(sum(areas_c, na.rm=TRUE),6)
+  print(paste(country, "- Check areas:",check_boolean_areas ))
+  check[j,6]=check_boolean_areas
 }
