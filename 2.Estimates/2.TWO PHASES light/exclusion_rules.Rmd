@@ -1,0 +1,119 @@
+---
+title: "LUCAS exclusion rules"
+author: 
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+```
+
+In this short note we define some exclusion rules to be applied to the LUCAS sampled and observed points.
+
+IMPORTANT: these exclusion rules can be applied with two different aims:
+
+1. To completely eliminate these observations and then apply the "standard" calibration procedure
+
+2. To use these observations only in a first phase estimation to produce only 1-digit LC and LU estimates, and then apply a second phase to estimate the 2-digit and 3-digit estimates including the 1-digit estimates in the known totals.
+
+
+
+We read the clean data, to which have been associated the sampling information (WGT_LUCAS and STRATUM_LUCAS):
+
+```{r}
+s1 <- fread("D:/Google Drive/LUCAS 2025/2.DATA/LUCAS22_corrected_complete.csv")
+nrow(s1)
+```
+
+
+
+First, we identify the observations with incomplete Land Cover values by inserting a "x" in the spaces:
+
+```{r}
+s2 <- s1
+s2$SURVEY_LC1 <- ifelse(nchar(as.character(s2$SURVEY_LC1)) == 2,
+                           paste0(s2$SURVEY_LC1,"X"),s2$SURVEY_LC1)
+s2$SURVEY_LC1 <- ifelse(nchar(as.character(s2$SURVEY_LC1)) == 1,
+                           paste0(s2$SURVEY_LC1,"XX"),s2$SURVEY_LC1)
+table(s2$SURVEY_LC1)
+```
+Then, we flag for elimination all the observations with a "X" (but not those with "B"):
+
+```{r}
+s2$elim <- grepl("X",s2$SURVEY_LC1)
+s2$elim <- ifelse(substr(s2$SURVEY_LC1,1,1)=="B",FALSE,s2$elim)
+table(s2$elim)
+```
+We have 5,594 cases to be eliminated.
+
+We proceed in the elimination:
+
+```{r}
+s2 <- s2[s2$elim == FALSE,]
+nrow(s2)
+```
+
+
+Then, we eliminate some values that are not present in the previous rounds of the survey (this elimination should be confirmed):
+
+```{r}
+s3 <- s2[!s2$SURVEY_LC1 %in% c("A00",
+                               "A10","A20",
+                               "B00","B10","B20","B30","B40","B50","B60","B70","B80",
+                               "C00",
+                               "C20",
+                               "D00",
+                               "E00",
+                               "F00",
+                               "G00",
+                               "G10","G20",
+                               "H00","H10","H20","H30"),]
+s3 <- s3[!s3$SURVEY_LU1 %in% c("8","U100","U110",
+                               "U200","U220",
+                               "U300","U310","U320","U360",
+                               "U400"),]
+nrow(s3)
+```
+Only 5 observations have been identified to be eliminated.
+
+Final LC and LU distributions:
+
+```{r}
+table(s3$SURVEY_LC1)
+```
+```{r}
+table(s3$SURVEY_LU1)
+```
+
+
+Finally, we analyze the observations to be eliminated:
+
+```{r}
+s4 <- s1[!s1$POINT_ID %in% s3$POINT_ID,]
+table(s4$SURVEY_LC1)
+```
+
+```{r}
+table(s4$SURVEY_LU1)
+```
+We observe the following:
+
+- there is a small incidence of the observations that would be eliminated (1.4%);
+
+- in terms of LC, a prevalence of C2 and C3 values (CONIFEROUS WOODLAND and MIXED WOODLAND)
+
+- in terms of LU, a prevalence of U112 (Fallow land)
+
+We underline that U112 is widely used in the determination of the FAO class, to assign the value "3".
+
+On the basis of the above, it should be decided one of the following choices:
+
+1. to proceed with the standard estimation procedure making use of all the observations, even if some anomalous estimates are produced
+
+2. to proceed with the standard estimation procedure, but without the observations with incomplete values
+
+3. to proceed with the "light" two-phase estimation procedure
+
+

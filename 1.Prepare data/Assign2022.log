@@ -1,0 +1,398 @@
+1                                                          The SAS System                            20:34 Tuesday, October 29, 2024
+
+NOTE: Copyright (c) 2002-2008 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.2 (TS1M0) 
+      Licensed to ISTAT PC SISSIEI, Site 0050300709.
+NOTE: This session is executing on the W32_VSPRO  platform.
+
+
+
+NOTE: SAS initialization used:
+      real time           0.34 seconds
+      cpu time            0.21 seconds
+      
+1          %web_drop_table(WORK.IMPORT);
+           _
+           180
+WARNING: Apparent invocation of macro WEB_DROP_TABLE not resolved.
+
+ERROR 180-322: Statement is not valid or it is used out of proper order.
+
+2          FILENAME REFFILE '/home/u63863079/LUCAS/survey22_noNA.csv';
+NOTE: PROCEDURE IMPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: SAS set option OBS=0 and will continue to check statements. This may cause NOTE: No observations in data set.
+3          PROC IMPORT DATAFILE=REFFILE
+4          	DBMS=CSV
+5          	OUT=WORK.Survey2022;
+6          	GETNAMES=YES;
+7          RUN;
+WARNING: Apparent invocation of macro WEB_OPEN_TABLE not resolved.
+8          /*
+9          PROC CONTENTS DATA=WORK.Survey2022;
+10         RUN;
+11         */
+12         %web_open_table(WORK.Survey2022);
+13         
+14         %macro AddVariable(in_ds_name,
+15         					out_ds_name,
+16         					fao_class_name,
+17         					lc1_name,
+18         					lu1_name,
+19         					lc2_name,
+20         					lu2_name,
+21         					lc1_species_name,
+22         					survey_area_size_name,
+23         					survey_tree_height_maturity_name,
+24         					survey_feature_width_name,
+25         					survey_lc_lu_special_remark_name);
+26         
+27         data &out_ds_name;
+28         set &in_ds_name;
+29         &fao_class_name='';
+30         
+31         length condition_fao_class $5.;
+32         length all_values $100.;
+33         
+34         all_values=trim(compress(&lc1_name))||'_'||trim(compress(&lu1_name));
+35         all_values=trim(compress(all_values))||'_'||trim(compress(&lc2_name));
+36         all_values=trim(compress(all_values))||'_'||trim(compress(&lu2_name));
+37         all_values=trim(compress(all_values))||'_'||trim(compress(&lc1_species_name));
+38         all_values=trim(compress(all_values))||'_'||trim(compress(&survey_area_size_name));
+39         all_values=trim(compress(all_values))||'_'||trim(compress(&survey_tree_height_maturity_name));
+2                                                          The SAS System                            20:34 Tuesday, October 29, 2024
+
+40         all_values=trim(compress(all_values))||'_'||trim(compress(&survey_feature_width_name));
+41         
+42         if (upcase(substr(&lc1_name,1,1))='G' or upcase(substr(&lc1_name,1,1))='H') then do;
+43         	&fao_class_name='0';
+44         	condition_fao_class='1';
+45         end;
+46         
+47         if (upcase(&lc1_name)='A22' and upcase(&lu1_name)='U312' and upcase(&lu2_name)='U120' and &fao_class_name='') then do;
+48         	&fao_class_name='1';
+49         	condition_fao_class='2';
+50         end;
+51         
+52         if (upcase(&lc1_name)='A30' and
+53         (upcase(substr(&lc2_name,1,1))='C' or upcase(substr(&lc2_name,1,1))='D' or upcase(substr(&lc2_name,1,1))='E' or
+54         upcase(substr(&lc2_name,1,1))='F') and
+55         upcase(&lu1_name)='U319' and upcase(&lu2_name)='U120' and &fao_class_name='') then do;
+56         	&fao_class_name='1';
+57         	condition_fao_class='3';
+58         end;
+59         
+60         if (upcase(substr(&lc1_name,1,2))='B7' and
+61         (upcase(&lu1_name)='U111' or upcase(&lu1_name)='U112' or upcase(&lu1_name)='U113' or upcase(substr(&lu1_name,1,2))='U4')
+61       ! and
+62         (upcase(&lc1_species_name) ne 'B75E' and upcase(&lc1_species_name) ne 'B75P') and
+63         &survey_area_size_name>1 and &fao_class_name='') then do;
+64         	&fao_class_name='3';
+65         	condition_fao_class='4';
+66         end;
+67         
+68         if (upcase(&lc1_name)='B81' and
+69         (upcase(&lu1_name)='U111' or upcase(&lu1_name)='U112' or upcase(&lu1_name)='U113' or upcase(substr(&lu1_name,1,2))='U4')
+69       ! and
+70         &survey_area_size_name>1 and &fao_class_name='') then do;
+71         	&fao_class_name='3';
+72         	condition_fao_class='5';
+73         end;
+74         
+75         if (upcase(&lc1_species_name)='B83F' and &survey_area_size_name>1 and &fao_class_name='') then do;
+76         	&fao_class_name='1';
+77         	condition_fao_class='6';
+78         end;
+79         
+80         if (upcase(substr(&lc1_name,1,1))='C' and &lc2_name='8' and upcase(&lu1_name)='U111' and &lu2_name='8' and
+80       ! &survey_area_size_name>1 and
+81         &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='') then do;
+82         	&fao_class_name='1';
+83         	condition_fao_class='7';
+84         end;
+85         
+86         if (upcase(substr(&lc1_name,1,1))='C' and
+87         (upcase(&lu1_name)='U111' or upcase(&lu1_name)='U112' or upcase(&lu1_name)='U113') and
+88         &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+88       !  then do;
+89         	&fao_class_name='3';
+90         	condition_fao_class='8_1';
+91         end;
+92         
+93         if (upcase(substr(&lc1_name,1,1))='C' and
+94         (upcase(&lu2_name)='U111' or upcase(&lu2_name)='U112' or upcase(&lu2_name)='U113') and
+95         &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+95       !  then do;
+96         	&fao_class_name='3';
+97         	condition_fao_class='8_2';
+3                                                          The SAS System                            20:34 Tuesday, October 29, 2024
+
+98         end;
+99         
+100        if (upcase(substr(&lc1_name,1,1))='C' and upcase(substr(&lc2_name,1,1))='B' and
+101        (upcase(substr(&lu1_name,1,2))='U4' or upcase(&lu1_name)='U120') and
+102        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+102      !  then do;	
+103        	&fao_class_name='3';
+104        	condition_fao_class='8_3';
+105        end;
+106        
+107        if (upcase(substr(&lc1_name,1,1))='C' and upcase(&lu1_name)='U120' and
+108        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U140' or upcase(&lu2_name)='U150' or upcase(&lu2_name)='U318'
+109        or upcase(&lu2_name)='U321' or upcase(&lu2_name)='U322' or upcase(&lu2_name)='U350'
+110        or upcase(&lu2_name)='U361' or upcase(&lu2_name)='U362' or upcase(&lu2_name)='U370') and
+111        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+111      !  then do;
+112        	&fao_class_name='1';
+113        	condition_fao_class='9_1';
+114        end;
+115        
+116        if (upcase(substr(&lc1_name,1,1))='C' and
+117        (upcase(&lu1_name)='U140' or upcase(&lu1_name)='U150' or upcase(substr(&lu1_name,1,2))='U4') and upcase(&lu2_name)='8'
+117      ! and
+118        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+118      !  then do;
+119        	&fao_class_name='1';
+120        	condition_fao_class='9_2';
+121        end;
+122        
+123        if (upcase(substr(&lc1_name,1,1))='C' and upcase(&lu1_name)='U350' and
+124        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U120') and
+125        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+125      !  then do;
+126        	&fao_class_name='1';
+127        	condition_fao_class='9_3';
+128        end;
+129        
+130        if (upcase(substr(&lc1_name,1,1))='C' and upcase(&lu1_name)='U318' and upcase(&lu2_name)='8' and
+131        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+131      !  then do;
+132        	&fao_class_name='1';
+133        	condition_fao_class='9_4';
+134        end;
+135        
+136        if (upcase(substr(&lc1_name,1,1))='C' and upcase(&lu1_name)='U120' and
+137        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U140' or upcase(&lu2_name)='U150' or
+138        upcase(&lu2_name)='U318' or upcase(&lu2_name)='U321' or upcase(&lu2_name)='U322' or
+139        upcase(&lu2_name)='U350' or upcase(&lu2_name)='U361' or upcase(&lu2_name)='U362' or upcase(&lu2_name)='U370') and
+140        &survey_area_size_name>1 and &survey_tree_height_maturity_name=1 and &fao_class_name='') then do;
+141        	&fao_class_name='2';
+142        	condition_fao_class='10_1';
+143        end;
+144        
+145        if (upcase(substr(&lc1_name,1,1))='C' and
+146        (upcase(&lu1_name)='U140' or upcase(&lu1_name)='U150' or upcase(substr(&lu1_name,1,2))='U4') and
+147        upcase(&lu2_name)='8' and &survey_area_size_name>1 and &survey_tree_height_maturity_name=1 and &fao_class_name='') then
+147      ! do;
+148        	&fao_class_name='2';
+149        	condition_fao_class='10_2';
+150        end;
+151        
+152        if (upcase(substr(&lc1_name,1,1))='C' and upcase(&lu1_name)='U350' and
+153        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U120') and
+4                                                          The SAS System                            20:34 Tuesday, October 29, 2024
+
+154        &survey_area_size_name>1 and &survey_tree_height_maturity_name=1 and &fao_class_name='') then do;
+155        	&fao_class_name='2';
+156        	condition_fao_class='10_3';
+157        end;
+158        
+159        if (
+160        (upcase(substr(&lc1_name,1,1))='D' or upcase(&lc1_name)='E10') and
+161        upcase(&lu1_name)='U120' and
+162        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U140' or upcase(&lu2_name)='U150' or
+163        upcase(&lu2_name)='U318' or upcase(&lu2_name)='U321' or upcase(&lu2_name)='U322' or
+164        upcase(&lu2_name)='U350' or upcase(&lu2_name)='U361' or upcase(&lu2_name)='U362' or upcase(&lu2_name)='U370') and
+165        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+165      !  then do;
+166        	&fao_class_name='2';
+167        	condition_fao_class='10_4';
+168        end;
+169        
+170        if (
+171        (upcase(substr(&lc1_name,1,1))='D' or upcase(&lc1_name)='E10') and
+172        (upcase(&lu1_name)='U140' or upcase(&lu1_name)='U150' or upcase(substr(&lu1_name,1,2))='U4') and
+173        upcase(&lu2_name)='8' and &survey_area_size_name>1 and
+174        &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='') then do;
+175        	&fao_class_name='2';
+176        	condition_fao_class='10_5';
+177        end;
+178        
+179        if (
+180        (upcase(substr(&lc1_name,1,1))='D' or upcase(&lc1_name)='E10') and
+181        upcase(&lu1_name)='U350' and
+182        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U120') and
+183        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+183      !  then do;
+184        	&fao_class_name='2';
+185        	condition_fao_class='10_6';
+186        end;
+187        
+188        if (upcase(&lc1_name)='D10' and upcase(&lu1_name)='U120' and
+189        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U140' or upcase(&lu2_name)='U150' or upcase(&lu2_name)='U318' or
+190        upcase(&lu2_name)='U321' or upcase(&lu2_name)='U322' or upcase(&lu2_name)='U350' or upcase(&lu2_name)='U361' or
+191        upcase(&lu2_name)='U362' or upcase(&lu2_name)='U370') and
+192        &survey_area_size_name=1 and &fao_class_name='') then do;
+193        	&fao_class_name='1';
+194        	condition_fao_class='11_1';
+195        end;
+196        
+197        if (upcase(&lc1_name)='D10' and upcase(substr(&lu1_name,1,2))='U4' and upcase(&lu2_name)='8' and
+198        &survey_area_size_name=1 and &fao_class_name='') then do;
+199        	&fao_class_name='1';
+200        	condition_fao_class='11_2';
+201        end;
+202        
+203        if (upcase(&lc1_name)='E10' and upcase(&lu1_name)='U120' and
+204        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U140' or upcase(&lu2_name)='U150' or upcase(&lu2_name)='U318' or
+205        upcase(&lu2_name)='U321' or upcase(&lu2_name)='U322' or upcase(&lu2_name)='U350' or upcase(&lu2_name)='U361' or
+206        upcase(&lu2_name)='U362' or upcase(&lu2_name)='U370') and
+207        &survey_area_size_name=1 and &fao_class_name='') then do;
+208        	&fao_class_name='1';
+209        	condition_fao_class='11_3';
+210        end;
+211        
+212        if (upcase(&lc1_name)='E10' and upcase(substr(&lu1_name,1,2))='U4' and upcase(&lu2_name)='8' and
+213        &survey_area_size_name=1 and &fao_class_name='') then do;
+214        	&fao_class_name='1';
+5                                                          The SAS System                            20:34 Tuesday, October 29, 2024
+
+215        	condition_fao_class='11_4';
+216        end;
+217        
+218        if (upcase(substr(&lc1_name,1,1))='C' and upcase(&lu1_name)='U120' and
+219        (upcase(&lu2_name)='8' or upcase(&lu2_name)='U140' or upcase(&lu2_name)='U150' or upcase(&lu2_name)='U318' or
+220        upcase(&lu2_name)='U321' or upcase(&lu2_name)='U322' or upcase(&lu2_name)='U350' or upcase(&lu2_name)='U361' or
+221        upcase(&lu2_name)='U362' or upcase(&lu2_name)='U370') and
+222        &survey_area_size_name=1 and &fao_class_name='') then do;
+223        	&fao_class_name='1';
+224        	condition_fao_class='11_5';
+225        end;
+226        
+227        if (upcase(substr(&lc1_name,1,1))='C' and
+228        (upcase(substr(&lu1_name,1,2))='U2' or upcase(substr(&lu1_name,1,3))='U31' or upcase(substr(&lu1_name,1,3))='U32'
+229        or upcase(substr(&lu1_name,1,3))='U34' or upcase(substr(&lu1_name,1,3))='U36' or upcase(&lu1_name)='U370') and
+230        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and &fao_class_name='')
+230      !  then do;
+231        	&fao_class_name='3';
+232        	condition_fao_class='12_1';
+233        end;
+234        
+235        if (upcase(substr(&lc1_name,1,1))='C' and upcase(&lu1_name)='U350' and
+236        &survey_area_size_name>1 and &survey_tree_height_maturity_name>1 and &survey_feature_width_name>1 and
+237        (upcase(&lu2_name)='U361' or upcase(&lu2_name)='U362')
+238        and &fao_class_name='') then do;
+239        	&fao_class_name='3';
+240        	condition_fao_class='12_2';
+241        end;
+242        
+243        if (upcase(&lu1_name)='U120' and
+244        (&survey_lc_lu_special_remark_name=3 or &survey_lc_lu_special_remark_name=4 or &survey_lc_lu_special_remark_name=5) and
+245        &fao_class_name='') then do;
+246        	&fao_class_name='1';
+247        	condition_fao_class='13';
+248        end;
+249        
+250        if (&fao_class_name='') then &fao_class_name='0';
+251        
+252        run;
+253        
+254        %mend AddVariable;
+255        
+256        
+257        %AddVariable(
+258        		WORK.Survey2022,
+259        		WORK.Survey2022_with_FAO,
+260        		fao_class_name,
+261        		SURVEY_LC1,
+262        		SURVEY_LU1,
+263        		SURVEY_LC2,
+264        		SURVEY_LU2,
+265        		SURVEY_LC1_SPEC,
+266        		SURVEY_PARCEL_AREA_HA,
+267        		SURVEY_TREE_HEIGHT_MATURITY,
+268        		SURVEY_FEATURE_WIDTH,
+269        		SURVEY_LC_LU_SPECIAL_REMARK
+270        );
+
+
+ERROR: File WORK.SURVEY2022.DATA does not exist.
+
+NOTE: Numeric values have been converted to character values at the places given by: (Line):(Column).
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+6                                                          The SAS System                            20:34 Tuesday, October 29, 2024
+
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1   270:1
+      270:1   270:1   270:1   270:1   270:1   
+NOTE: Character values have been converted to numeric values at the places given by: (Line):(Column).
+      270:137   270:184   
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.SURVEY2022_WITH_FAO may be incomplete.  When this step was stopped there were 0 observations and 12 
+         variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+
+271        
+272        
+273        PROC FREQ DATA=WORK.Survey2022_with_FAO;
+274         TABLES fao_class_name;
+275         TABLES condition_fao_class;
+276         TABLES condition_fao_class * fao_class_name;
+277        RUN;
+
+NOTE: PROCEDURE FREQ used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+278          /*
+279         TABLES SURVEY_LC1;
+280         TABLES SURVEY_LU1;
+281         TABLES SURVEY_LC2;
+282         TABLES SURVEY_LU2;
+283         TABLES	SURVEY_LC1_SPEC;
+284         TABLES SURVEY_PARCEL_AREA_HA;
+285         TABLES SURVEY_TREE_HEIGHT_MATURITY;
+286         TABLES	SURVEY_FEATURE_WIDTH;
+287         TABLES	SURVEY_LC_LU_SPECIAL_REMARK;
+288        
+289        RUN;
+290         */
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+NOTE: The SAS System stopped processing this step because of errors.
+291        PROC EXPORT DATA=WORK.Survey2022_with_FAO
+292            OUTFILE="/home/u63863079/LUCAS/SURVEY2022_WITH_FAO.csv"
+293            DBMS=CSV
+294            REPLACE;
+295            DELIMITER=',';
+296            PUTNAMES=YES;
+297        RUN;
+
+
+ERROR: Errors printed on pages 1,5.
+7                                                          The SAS System                            20:34 Tuesday, October 29, 2024
+
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           0.37 seconds
+      cpu time            0.26 seconds
+      
