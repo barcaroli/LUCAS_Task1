@@ -37,8 +37,8 @@ if (!dir.exists(direnew2))
   dir.create(direnew2)
 # 
 direnew3 <- paste(dire, "/Samples", sep = "")
-if (dir.exists(direnew1))
-  unlink(direnew1,recursive=TRUE)
+if (dir.exists(direnew3))
+  unlink(direnew3,recursive=TRUE)
 if (!dir.exists(direnew3))
   dir.create(direnew3)
 # 
@@ -167,12 +167,12 @@ summary(s2022$settl_pc)
 ###########################################################################
 # master processing
 ###########################################################################
-master$ELEV2 <- ifelse(master$ELEV_DEM < 100, 1,
-                       ifelse(master$ELEV_DEM < 200, 2,
-                              ifelse(master$ELEV < 500, 3,
-                                     ifelse(master$ELEV_DEM < 1000, 4,
-                                            ifelse(master$ELEV_DEM < 1500, 5, 6)))))
-table(master$ELEV2)
+# master$ELEV2 <- ifelse(master$ELEV_DEM < 100, 1,
+#                        ifelse(master$ELEV_DEM < 200, 2,
+#                               ifelse(master$ELEV < 500, 3,
+#                                      ifelse(master$ELEV_DEM < 1000, 4,
+#                                             ifelse(master$ELEV_DEM < 1500, 5, 6)))))
+table(master$ELEV2,useNA="ifany")
 # master$ELEV2 <- as.factor(master$ELEV2)
 # 
 # master$CLC18_1d<-factor(substr(master$CLC18_vett,1,1))

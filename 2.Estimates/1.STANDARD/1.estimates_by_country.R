@@ -32,6 +32,7 @@ if (!dir.exists(direnew2))
 # Read survey 2022
 #------------------------------------------
 s2022 <- fread(paste0(path_data,"LUCAS22_corrected_complete.csv"))
+table(s2022$fao_class_name)/nrow(s2022)
 #remove rows with NA in LC, LU
 s2022=s2022[!(is.na(s2022$SURVEY_LC1) | is.na(s2022$SURVEY_LU1)), ]
 a <- s2022[s2022$SURVEY_LC1 == "8", ]
@@ -216,11 +217,12 @@ summary(s2022$settl_pc)
 ###########################################################################
 # master processing
 ###########################################################################
-master$ELEV2 <- ifelse(master$ELEV_DEM < 100, 1, 
-                       ifelse(master$ELEV_DEM < 200, 2,
-                              ifelse(master$ELEV < 500, 3,
-                                     ifelse(master$ELEV_DEM < 1000, 4,
-                                            ifelse(master$ELEV_DEM < 1500, 5, 6)))))
+table(master$ELEV2,useNA="ifany")
+# master$ELEV2 <- ifelse(master$ELEV_DEM < 100, 1, 
+#                        ifelse(master$ELEV_DEM < 200, 2,
+#                               ifelse(master$ELEV < 500, 3,
+#                                      ifelse(master$ELEV_DEM < 1000, 4,
+#                                             ifelse(master$ELEV_DEM < 1500, 5, 6)))))
 master$ELEV2 <- as.factor(master$ELEV2)
 
 master$CLC18_1d<-factor(substr(master$CLC18_vett,1,1))
@@ -252,6 +254,8 @@ for (i in c(1:length(paesi))) {
                                              "ELEV2","N2K_SITETYPE",
                                              "IMP18_10_cl", "IBU18_10","GRA18_10","FTY18_10",
                                              "CLC18_1d","BCK18_R","BCK21_R")]
+    
+    # m <- master[master$NUTS0_24 == country,c("POINT_ID","GRA18_10","FTY18_10","BCK21_R")]
     ##########################################
     m <- m[!is.na(m$NUTS2_24),]
     # m$geometry<-NULL
