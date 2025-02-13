@@ -28,9 +28,9 @@ The order of execution is:
 
 1.prepare_LUCAS_input.R
 2.Standard_estimates.R
-2.all_years.estimates.R
 2a.attribute_cal_wgts_standard.R
-2a.EU_estimates.R
+2b.all_years.estimates.R
+2c.EU_estimates.R
 3.estimates_pro_two_phases.R
 4.estimates_twoPhases.R
 5.attribute_cal_wgts_twophase.R
