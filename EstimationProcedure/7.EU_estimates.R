@@ -12,7 +12,9 @@
 #----------------------------------------------------------
 options(stringsAsFactors = TRUE)
 options(scipen=100)
-detach("package:xlsx", unload = TRUE)
+if ("xlsx" %in% loadedNamespaces()){
+  detach("package:xlsx", unload = TRUE)
+}
 library(openxlsx)
 library(data.table)
 EU_structure <- read.csv("EU_structure.csv")

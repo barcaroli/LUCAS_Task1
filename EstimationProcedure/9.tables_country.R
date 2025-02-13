@@ -7,7 +7,9 @@
 # Output: ./9.Tables_country/all_countries_estimates.xlsx
 #----------------------------------------------------------
 options(stringsAsFactors = TRUE)
-detach("package:xlsx", unload = TRUE)
+if ("xlsx" %in% loadedNamespaces()){
+  detach("package:xlsx", unload = TRUE)
+}
 library(openxlsx)
 library(data.table)
 

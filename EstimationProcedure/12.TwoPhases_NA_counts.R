@@ -841,4 +841,4 @@ addWorksheet(wb, sheetName = "NUTS2")
 writeData(wb, sheet = "NUTS2", x = E, colNames = TRUE, rowNames = FALSE)
 
 # Write all
-saveWorkbook(wb, paste0(direnew1,"NA_count_2phases_light.xlsx"), overwrite = TRUE)
+saveWorkbook(wb, paste0(direnew1,"NA_count_2phases.xlsx"), overwrite = TRUE)

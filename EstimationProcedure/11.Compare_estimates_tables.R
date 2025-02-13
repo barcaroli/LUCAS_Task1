@@ -19,7 +19,9 @@ if (!dir.exists(direnew1))
 
 library(formattable)
 library(openxlsx)
-#detach("package:xlsx", unload = TRUE)
+if ("xlsx" %in% loadedNamespaces()){
+  detach("package:xlsx", unload = TRUE)
+}
 wb <- createWorkbook()
 headerStyle <- createStyle(textDecoration = "bold",halign="center", fontSize=14,fontColour = "#FFFFFF", fgFill = "#4F81BD")
 bodyStyle <- createStyle(textDecoration = "bold", fontSize=12,fontColour = "#FFFFFF", fgFill = "#4F81BD")

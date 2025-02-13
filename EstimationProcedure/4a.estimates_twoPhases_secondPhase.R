@@ -198,7 +198,7 @@ sum(s2$WGT_LUCAS)
 m$ones <- 1
 sum(m$ones)
 sum(m$point_area)
-cal2$prob <- cal2$prob/cal2$variables$point_area
+#cal2$prob <- cal2$prob/cal2$variables$point_area
 sum(1/cal2$prob)
 sum(weights(cal2))
 summary(s2$WGT_LUCAS)

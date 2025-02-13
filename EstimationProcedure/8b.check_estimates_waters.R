@@ -17,9 +17,9 @@ variable = c("SURVEY_LC1_1G","SURVEY_LC1_1H",
              "SURVEY_LC1_2G1","SURVEY_LC1_2G2","SURVEY_LC1_2G5","SURVEY_LC1_2H1",
              "SURVEY_LC1_3G10","SURVEY_LC1_3G11","SURVEY_LC1_3G20","SURVEY_LC1_3G21",
              "SURVEY_LC1_3G50","SURVEY_LC1_3H11","SURVEY_LC1_3H12")
-path_data <- "D:/Google Drive/LUCAS 2025/2.DATA/"
-# load(paste0(path_data,"Master_con_hrl_e_NUTS24.Rdata"))
-load(paste0(path_data,"countries.Rdata"))
+
+load("countries.Rdata")
+
 
 
 for (w in (1:length(variable))) {
