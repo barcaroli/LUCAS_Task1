@@ -41,11 +41,14 @@ table(s2022$SURVEY_LC1)
 #------------------------------------------
 
 s2022$flag_two <- grepl("X",s2022$SURVEY_LC1)
-s2022$flag_two <- ifelse(substr(s2022$SURVEY_LC1,1,1)=="B",FALSE,s2022$flag_two)
+# s2022$flag_two <- ifelse(substr(s2022$SURVEY_LC1,1,1)=="B",FALSE,s2022$flag_two)
 table(s2022$flag_two)
 s2022$flag_two <- ifelse(s2022$SURVEY_LC1 %in% c("A00",
                                                  "A10","A20",
                                                  "B00","B10","B20","B30","B40","B50","B60","B70","B80",
+                                                 ###########
+                                                 "BX1","BX2",
+                                                 ###########
                                                  "C00",
                                                  "C20",
                                                  "D00",
@@ -59,6 +62,25 @@ s2022$flag_two <- ifelse(s2022$SURVEY_LC1 %in% c("A00",
                                                  "U300","U310","U320","U360",
                                                  "U400"),
                          TRUE,s2022$flag_two)
+table(s2022$flag_two)
+table(s2022$SURVEY_LC1)
+
+#####################################################################
+# Exclude a percentage of the "A2" land cover if obs_type = "PI"
+#  only in countries where "A1" Area 2018 external to 2022 C.I.
+perc <- 0.50
+a <- s2022[s2022$NUTS0_24 %in% c("EL","EE","NL","SK") 
+           & substr(s2022$SURVEY_LC1,1,2) == "A2" 
+           & s2022$SURVEY_OBS_TYPE == 7,]
+a <- a[sample(c(1:nrow(a)),nrow(a)*perc),]
+table(a$NUTS0_24)
+
+s2022$flag_two <- ifelse(s2022$POINT_ID %in% a$POINT_ID, TRUE, s2022$flag_two)
+table(s2022$flag_two)
+#####################################################################
+a <- s2022[s2022$flag_two==FALSE,]
+table(a$SURVEY_LC1)
+
 s2022$flag_two <- ifelse(s2022$flag_two==FALSE,"Yes","No")
 options(scipen=100)
 addmargins(table(s2022$SURVEY_LC1,s2022$flag_two))

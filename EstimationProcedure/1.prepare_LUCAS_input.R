@@ -21,6 +21,13 @@ s2022$SURVEY_LU1_SPEC <- toupper(s2022$SURVEY_LU1_SPEC)
 s2022$SURVEY_FEATURE_WIDTH <- ifelse(is.na(s2022$SURVEY_FEATURE_WIDTH),8,s2022$SURVEY_FEATURE_WIDTH)
 s2022$SURVEY_TREE_HEIGHT_MATURITY <- ifelse(is.na(s2022$SURVEY_TREE_HEIGHT_MATURITY),8,s2022$SURVEY_TREE_HEIGHT_MATURITY)
 ######################################################################
+#####################################################################
+# MODIFIED:
+a <- s2022[s2022$SURVEY_LC1=="G30" | s2022$SURVEY_LC1=="G40",]
+s2022 <- s2022[!(s2022$SURVEY_LC1=="G30" | s2022$SURVEY_LC1=="G40"),]
+######################################################################
+
+
 
 # Assign WGT_LUCAS + STRATUM_LUCAS
 s2 <- fread("sample_LUCAS_2022.csv")

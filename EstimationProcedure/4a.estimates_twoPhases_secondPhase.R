@@ -34,13 +34,16 @@ cat("\nN.obs before selection:",nrow(s2))
 # Select only obs without 'x' in LC1 and LU1
 
 # Exclude obs with a "x" or "X" in the land cover and land use values
-# with the exception of "B" LC
+# 
 s2$flag_two <- grepl("X",s2$SURVEY_LC1)
 s2$flag_two <- ifelse(substr(s2$SURVEY_LC1,1,1)=="B",FALSE,s2$flag_two)
 table(s2$flag_two)
 s2$flag_two <- ifelse(s2$SURVEY_LC1 %in% c("A00",
                                                  "A10","A20",
                                                  "B00","B10","B20","B30","B40","B50","B60","B70","B80",
+                                                 ###########
+                                                 "BX1","BX2",
+                                                 ###########
                                                  "C00",
                                                  "C20",
                                                  "D00",
@@ -54,6 +57,21 @@ s2$flag_two <- ifelse(s2$SURVEY_LC1 %in% c("A00",
                                                    "U300","U310","U320","U360",
                                                    "U400"),
                          TRUE,s2$flag_two)
+
+#####################################################################
+# Exclude a percentage of the "A2" land cover if obs_type = "PI"
+#  only in countries where "A1" Area 2018 external to 2022 C.I.
+perc <- 0.50
+a <- s2[s2$NUTS0_24 %in% c("EL","EE","NL","SK") 
+           & substr(s2$SURVEY_LC1,1,2) == "A2" 
+           & s2$SURVEY_OBS_TYPE == 7,]
+a <- a[sample(c(1:nrow(a)),nrow(a)*perc),]
+table(a$NUTS0_24)
+
+s2$flag_two <- ifelse(s2$POINT_ID %in% a$POINT_ID, TRUE, s2$flag_two)
+table(s2$flag_two)
+#####################################################################
+
 table(s2$flag_two)
 
 s2 <- s2[s2$flag_two == FALSE,]
@@ -99,8 +117,10 @@ if (!is.null(ls)) {
 #-----------------------------
 # Prepare calibration
 #-----------------------------
+# model1=as.formula("~NUTS2_24 + SURVEY_LC1_1+SURVEY_LU1_1 + ELEV2 + BCK21_R + GRA18_10 + FTY18_10 - 1")
 model1=as.formula("~point_area:(NUTS2_24 + SURVEY_LC1_1+SURVEY_LU1_1 + ELEV2 + BCK21_R + GRA18_10 + FTY18_10) - 1")
 # model2=as.formula("~point_area:(SURVEY_LC1_1+SURVEY_LU1_1 + ELEV2 + BCK21_R + GRA18_10 + FTY18_10) - 1")
+# model2=as.formula("~SURVEY_LC1_1+SURVEY_LU1_1 - 1")
 model2=as.formula("~point_area:(SURVEY_LC1_1+SURVEY_LU1_1) - 1")
 
 if (length(levels(as.factor(s$NUTS2_24))) > 1) {
@@ -198,8 +218,8 @@ sum(s2$WGT_LUCAS)
 m$ones <- 1
 sum(m$ones)
 sum(m$point_area)
-#cal2$prob <- cal2$prob/cal2$variables$point_area
-sum(1/cal2$prob)
+cal2$prob <- cal2$prob/cal2$variables$point_area
+# sum(1/cal2$prob)
 sum(weights(cal2))
 summary(s2$WGT_LUCAS)
 

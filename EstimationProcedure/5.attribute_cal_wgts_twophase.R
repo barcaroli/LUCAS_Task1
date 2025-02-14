@@ -29,4 +29,8 @@ s_wgt$wgt_2nd_phase <- ifelse(is.na(s_wgt$wgt_2nd_phase),0,s_wgt$wgt_2nd_phase)
 summary(s_wgt$wgt_2nd_phase)
 sum(s_wgt$wgt_2nd_phase)
 dim(s_wgt)
+a <- s_wgt[s_wgt$wgt_2nd_phase == 0,]
+nrow(a) / nrow(s_wgt)
 write.table(s_wgt,file="Survey_2022_cal_wgt_2nd_phase.txt",sep="\t",row.names=F,col.names=T,quote=F)
+
+
