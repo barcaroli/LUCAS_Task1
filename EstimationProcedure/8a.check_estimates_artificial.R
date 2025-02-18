@@ -116,7 +116,7 @@ for (w in (1:length(variable))) {
             # anom$Area2015_CV[k] <- df[df$Variable==variable[w],c("CV.2")],3)
             anom$Area2018[k] <- df[df$Variable==variable[w],c("Area_2018")]
             anom$Area2018_CI_l[k] <- df[df$Variable==variable[w],c("CI_lower.2")]
-            anom$Area2018_CI_u[k] <- df[df$Variable==variable[w],c("CI_upper.3")]
+            anom$Area2018_CI_u[k] <- df[df$Variable==variable[w],c("CI_upper.2")]
             # anom$Area2018_SE[k] <- df[df$Variable==variable[w],c("Std_error.3")],2)
             # anom$Area2018_CV[k] <- df[df$Variable==variable[w],c("CV.3")],3)
             anom$Area2022[k] <- df[df$Variable==variable[w],c("Area_2022")]
