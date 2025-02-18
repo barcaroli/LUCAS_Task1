@@ -7,7 +7,7 @@ options("knitr.duplicate.label" = "allow")
 knitr::opts_chunk$set(warning = FALSE, echo=FALSE)
 
 current_wd <- getwd()
-setwd(paste0(current_wd,"/11.Comparisons"))
+setwd(paste0(current_wd,"./11.Comparisons"))
 
 
 rmarkdown::render("A.Compare_estimates_tables.Rmd",
