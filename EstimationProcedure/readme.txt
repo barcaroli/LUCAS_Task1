@@ -31,7 +31,7 @@ The order of execution is:
 2a.attribute_cal_wgts_standard.R
 2b.all_years.estimates.R
 2c.EU_estimates.R
-3.estimates_pro_two_phases.R
+3.estimates_pro_twoPhases.R
 4.estimates_twoPhases.R
 5.attribute_cal_wgts_twophase.R
 6.all_years_estimates.R
@@ -44,6 +44,7 @@ The order of execution is:
 11.Compare_estimates_tables_by_NUTS0.R
 11.Compare_estimates_tables_by_NUTS1.R
 11.Compare_estimates_tables_by_NUTS2.R
+11.render_comparisons.R
 12.TwoPhases_NA_counts.R
 
 The whole procedure can be execute in batch with the execute_procedure.bat

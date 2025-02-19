@@ -14,6 +14,10 @@ library(openxlsx)
 library(dplyr)
 library(tidyr)
 
+if ("xlsx" %in% loadedNamespaces()){
+  detach("package:xlsx", unload = TRUE)
+}
+
 # read countries:
 load("countries.RData")
 

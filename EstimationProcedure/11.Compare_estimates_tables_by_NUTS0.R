@@ -16,7 +16,9 @@ direnew1 <- paste(dire, "/11.Comparisons/", sep = "")
 if (!dir.exists(direnew1)) 
   dir.create(direnew1)
 
-
+if ("xlsx" %in% loadedNamespaces()){
+  detach("package:xlsx", unload = TRUE)
+}
 library(formattable)
 library(openxlsx)
 
