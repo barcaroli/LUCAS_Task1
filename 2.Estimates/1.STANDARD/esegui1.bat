@@ -1,1 +1,0 @@
-R CMD BATCH 1.estimates_by_country.R

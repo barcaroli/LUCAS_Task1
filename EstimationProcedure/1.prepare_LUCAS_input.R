@@ -12,6 +12,7 @@
 #----------------------------------------------------------
 library(data.table)
 s2022 <- fread("LUCAS22_corrected_v4.csv")
+table(s2022$SURVEY_LC1)
 #####################################################################
 # MODIFIED:
 s2022$SURVEY_LC1 <- toupper(s2022$SURVEY_LC1)
@@ -23,11 +24,34 @@ s2022$SURVEY_TREE_HEIGHT_MATURITY <- ifelse(is.na(s2022$SURVEY_TREE_HEIGHT_MATUR
 ######################################################################
 #####################################################################
 # MODIFIED:
-a <- s2022[s2022$SURVEY_LC1=="G30" | s2022$SURVEY_LC1=="G40",]
+# a <- s2022[s2022$SURVEY_LC1=="G30" | s2022$SURVEY_LC1=="G40",]
 s2022 <- s2022[!(s2022$SURVEY_LC1=="G30" | s2022$SURVEY_LC1=="G40"),]
 ######################################################################
+#####################################################################
+# MODIFIED:
+s2018 <- fread("Survey_2018_cal_wgt.txt")
+table(s2018$SURVEY_OBS_TYPE)
+s2018$obs_type2018 <- ifelse(s2018$SURVEY_OBS_TYPE == 1,1,2)
+s2022$obs_type2022 <- ifelse(s2022$SURVEY_OBS_TYPE == 1,1,2)
+panel <- s2022[s2022$POINT_ID %in% s2018$POINT_ID,c("POINT_ID","SURVEY_LC1","SURVEY_LU1","obs_type2022")]
+panel <- merge(panel,s2018[,c("POINT_ID","land_cover","land_use","obs_type2018")])
+# load("master_complete.RData")
+# panel <- merge(panel,master[,c("POINT_ID","BCK21_R")])
+panel$ones <- 1
+panel_A <- panel[substr(panel$land_cover,1,2)=="A1" & substr(panel$SURVEY_LC1,1,2)!="A1",]
+# xtabs(ones~BCK21_R+SURVEY_LC1,data=panel_A)
+panel_B <- panel_A[panel_A$obs_type2018==1 & panel_A$obs_type2022==2,]
+# xtabs(ones~BCK21_R+SURVEY_LC1,data=panel_B)
+xtabs(ones~land_cover+SURVEY_LC1,data=panel_B)
+panel_C <- panel_B[panel_B$land_cover=="A11" & panel_B$SURVEY_LC1 %in% c("A21","A22","A23"),]
 
+xtabs(ones~land_cover+SURVEY_LC1,data=panel_C)
+# xtabs(ones~land_cover+SURVEY_LC1+BCK21_R,data=panel_C)
+s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% panel_C$POINT_ID,"A11",s2022$SURVEY_LC1)
+cat("\n Number of modified observations for A1: ",nrow(panel_C),"\n")
+table(s2022$SURVEY_LC1)
 
+######################################################################
 
 # Assign WGT_LUCAS + STRATUM_LUCAS
 s2 <- fread("sample_LUCAS_2022.csv")

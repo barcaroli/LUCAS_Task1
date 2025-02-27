@@ -16,8 +16,8 @@ library(openxlsx)
 
 dire <- getwd()
 direnew1 <- paste(dire, "/2.StandardEstimates2022", sep = "")
-if (dir.exists(direnew1))
-  unlink(direnew1,recursive=TRUE)
+# if (dir.exists(direnew1))
+#   unlink(direnew1,recursive=TRUE)
 if (!dir.exists(direnew1))
   dir.create(direnew1)
 # 
@@ -115,7 +115,7 @@ master$ones <- 1
 ##########
 
 paesi <- levels(as.factor(s2022$NUTS0_24))
-i = which(paesi=="AT")
+i = which(paesi=="SE")
 i
 
 for (i in c(1:length(paesi))) {
@@ -163,7 +163,8 @@ for (i in c(1:length(paesi))) {
                            fpc= ~fpc, 
                            check.data= TRUE)
         ls <- find.lon.strata(des)
-        if (!is.null(ls)) des <- collapse.strata(des, block.vars = ~NUTS2_24)
+        # if (!is.null(ls)) des <- collapse.strata(des, block.vars = ~NUTS2_24)
+        if (!is.null(ls)) des <- collapse.strata(des)
         
         levels(des$variables$BCK21_R)<-levels(m$BCK21_R)
         levels(des$variables$GRA18_10)<-levels(m$GRA18_10)
@@ -180,7 +181,17 @@ for (i in c(1:length(paesi))) {
                                       GRA18_10 +
                                       FTY18_10) - 1,
                                 )
-
+        if (country == "SE") {
+          poptemp <- pop.template(data=des,
+                                  calmodel=   ~
+                                    point_area:NUTS2_24 +
+                                    point_area:(
+                                      # ELEV2 +
+                                      BCK21_R +
+                                        GRA18_10 +
+                                        FTY18_10) - 1,
+                                )
+        }
         # fill template with the master
         popfill <- fill.template(universe=m, template= poptemp)
         ######################################################

@@ -57,25 +57,18 @@ s2$flag_two <- ifelse(s2$SURVEY_LC1 %in% c("A00",
                                                    "U300","U310","U320","U360",
                                                    "U400"),
                          TRUE,s2$flag_two)
-
+t <- table(s2$flag_two)
+cat("\nExclusions due to X: ",t[2])
 #####################################################################
-# Exclude a percentage of the "A2" land cover if obs_type = "PI"
-#  only in countries where "A1" Area 2018 external to 2022 C.I.
-perc <- 0.50
-a <- s2[s2$NUTS0_24 %in% c("EL","EE","NL","SK") 
-           & substr(s2$SURVEY_LC1,1,2) == "A2" 
-           & s2$SURVEY_OBS_TYPE == 7,]
-a <- a[sample(c(1:nrow(a)),nrow(a)*perc),]
-table(a$NUTS0_24)
-
+# Exclude obs with "A3" and not-Field
+a <- s2[substr(s2$SURVEY_LC1,1,2) == "A3"
+           & s2$SURVEY_OBS_TYPE != 1,]
+cat("\nExclusions due to A3 PI: ",nrow(a))
 s2$flag_two <- ifelse(s2$POINT_ID %in% a$POINT_ID, TRUE, s2$flag_two)
-table(s2$flag_two)
 #####################################################################
-
-table(s2$flag_two)
 
 s2 <- s2[s2$flag_two == FALSE,]
-cat("\nN.obs after selection:",nrow(s2))
+cat("\nN.obs after selection: ",nrow(s2))
 
 ###########################################################
 # Update fpc

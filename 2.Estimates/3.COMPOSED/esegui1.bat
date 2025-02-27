@@ -1,1 +1,0 @@
-R CMD BATCH 1.Composed_estimator_by_Nuts0.R
