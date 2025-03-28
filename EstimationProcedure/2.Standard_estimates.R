@@ -22,8 +22,8 @@ if (!dir.exists(direnew1))
   dir.create(direnew1)
 # 
 direnew2 <- paste(dire, "/2.StandardWeights2022", sep = "")
-if (dir.exists(direnew2))
-  unlink(direnew2,recursive=TRUE)
+# if (dir.exists(direnew2))
+#   unlink(direnew2,recursive=TRUE)
 if (!dir.exists(direnew2))
   dir.create(direnew2)
 
@@ -115,7 +115,7 @@ master$ones <- 1
 ##########
 
 paesi <- levels(as.factor(s2022$NUTS0_24))
-i = which(paesi=="SE")
+i = which(paesi=="PT")
 i
 
 for (i in c(1:length(paesi))) {

@@ -22,10 +22,19 @@ s2022$SURVEY_LU1_SPEC <- toupper(s2022$SURVEY_LU1_SPEC)
 s2022$SURVEY_FEATURE_WIDTH <- ifelse(is.na(s2022$SURVEY_FEATURE_WIDTH),8,s2022$SURVEY_FEATURE_WIDTH)
 s2022$SURVEY_TREE_HEIGHT_MATURITY <- ifelse(is.na(s2022$SURVEY_TREE_HEIGHT_MATURITY),8,s2022$SURVEY_TREE_HEIGHT_MATURITY)
 ######################################################################
-#####################################################################
+# MODIFIED (change LU2):
+xtabs(~SURVEY_LU2,data=s2022,addNA=TRUE)
+s2018 <- fread("Input_Data_EU_LUCAS_2018.CSV")
+s2018$POINT_ID <- as.numeric(s2018$POINT_ID)
+s2022 <- merge(s2022,s2018[,c("POINT_ID","LU2")],by="POINT_ID",all.x=TRUE)
+s2022$SURVEY_LU2 <- ifelse(!is.na(s2022$LU2) & s2022$LU2 == "8","8",s2022$SURVEY_LU2)
+s2022$LU2 <- NULL
+xtabs(~SURVEY_LU2,data=s2022,addNA=TRUE)
+######################################################################
 # MODIFIED:
 # a <- s2022[s2022$SURVEY_LC1=="G30" | s2022$SURVEY_LC1=="G40",]
 s2022 <- s2022[!(s2022$SURVEY_LC1=="G30" | s2022$SURVEY_LC1=="G40"),]
+b <- s2022[s2022$SURVEY_LC1=="C30",]
 ######################################################################
 #####################################################################
 # MODIFIED:
@@ -44,11 +53,14 @@ panel_B <- panel_A[panel_A$obs_type2018==1 & panel_A$obs_type2022==2,]
 # xtabs(ones~BCK21_R+SURVEY_LC1,data=panel_B)
 xtabs(ones~land_cover+SURVEY_LC1,data=panel_B)
 panel_C <- panel_B[panel_B$land_cover=="A11" & panel_B$SURVEY_LC1 %in% c("A21","A22","A23"),]
+panel_D <- panel_B[panel_B$land_cover=="A12",]
 
 xtabs(ones~land_cover+SURVEY_LC1,data=panel_C)
 # xtabs(ones~land_cover+SURVEY_LC1+BCK21_R,data=panel_C)
 s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% panel_C$POINT_ID,"A11",s2022$SURVEY_LC1)
-cat("\n Number of modified observations for A1: ",nrow(panel_C),"\n")
+s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% panel_D$POINT_ID,"A12",s2022$SURVEY_LC1)
+cat("\n Number of modified observations for A11: ",nrow(panel_C),"\n")
+cat("\n Number of modified observations for A12: ",nrow(panel_D),"\n")
 table(s2022$SURVEY_LC1)
 
 ######################################################################
