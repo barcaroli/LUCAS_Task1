@@ -5,6 +5,8 @@
 # Output: ./8.anomalies/waters_anomalies.xlsx
 #######################################################################
 library(xlsx)
+library(flextable)
+library(officer)
 
 dire <- getwd()
 direnew1 <- paste(dire, "./8.anomalies/", sep = "")
@@ -20,6 +22,7 @@ variable = c("SURVEY_LC1_1G","SURVEY_LC1_1H",
 
 load("countries.Rdata")
 
+doc <- read_docx()
 
 
 for (w in (1:length(variable))) {
@@ -176,6 +179,23 @@ for (w in (1:length(variable))) {
     # anom <- anom[,c(1,3,6,9,12,15,18)]
     write.xlsx(anom, filename, sheetName = variable[w], 
                col.names = TRUE, row.names = FALSE, append = TRUE)
+    anom$Area2018 <- round(anom$Area2018,2)
+    anom$Area2018_CI_l <- round(anom$Area2018_CI_l,2)
+    anom$Area2018_CI_u <- round(anom$Area2018_CI_u,2)
+    anom$Area2022 <- round(anom$Area2022,2)
+    anom$Area2022_CI_l <- round(anom$Area2022_CI_l,2)
+    anom$Area2022_CI_u <- round(anom$Area2022_CI_u,2)
+    ft <- flextable(anom[, c("country", 
+                             "Area2018", "Area2018_CI_l","Area2018_CI_u",
+                             "Area2022", "Area2022_CI_l","Area2022_CI_u",
+                             "signal")])
+    ft <- set_caption(ft, caption = paste0("Anomalies for variable ",variable[w]))
+    ft <- fontsize(ft, size = 8, part = "all")
+    ft <- set_table_properties(ft, layout = "fixed", width = 0.5)
+    ft <- autofit(ft)
+    ft
+    doc <- body_add_flextable(doc, value = ft)
+    print(doc, target = "./8.anomalies/anomalies_water.docx")
   }
 }
 

@@ -3,7 +3,7 @@ title: "LUCAS 2022 - LC and LU 2 and 3 digits estimates"
 subtitle: "Comparison between standard and two-phases estimation procedures"
 author: 
 date: "`r Sys.Date()`"
-output: html_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -20,6 +20,7 @@ options(scipen=100)
 #---------------------------------
 library(formattable)
 library(openxlsx)
+library(flextable)
 wb <- createWorkbook()
 headerStyle <- createStyle(textDecoration = "bold",halign="center", fontSize=14,fontColour = "#FFFFFF", fgFill = "#4F81BD")
 bodyStyle <- createStyle(textDecoration = "bold", fontSize=12,fontColour = "#FFFFFF", fgFill = "#4F81BD")
@@ -64,7 +65,10 @@ est_2 <- est_2[,c("Variable","standard_Area2022","twophase_Area2022","area_rel_d
 # est_2[,c("standard_CV_2022","twophase_CV_2022")] <- round(est_2[,c("standard_CV_2022","twophase_CV_2022")],3 )
 # est_2[est_2$Variable=="LC1_2A1",c("standard_Area2022","twophase_Area2022","standard_CV_2022","twophase_CV_2022")]
 
-
+ft <- flextable(est_2[, c("Variable", "standard_CV_2022", "twophase_CV_2022", "cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for two-digit Land Cover estimates")
+ft <- autofit(ft)
+ft
 
 # Create a formattable table with in-cell color scales and bars
 t <- formattable(
@@ -79,7 +83,7 @@ t <- formattable(
     #            style = x ~ style(font.weight = "bold", color = ifelse(abs(x) > 0.4, "red", "black")))
   )
 )
-t
+# t
 addWorksheet(wb, sheetName = "LC 2 digits")
 addStyle(wb, sheet = "LC 2 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LC 2 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)
@@ -102,7 +106,10 @@ est_2 <- est_2[,c("Variable","standard_Area2022","twophase_Area2022","area_rel_d
 # est_2[,c("standard_Area2022","twophase_Area2022")] <- round(est_2[,c("standard_Area2022","twophase_Area2022")] )
 # est_2[,c("standard_CV_2022","twophase_CV_2022")] <- round(est_2[,c("standard_CV_2022","twophase_CV_2022")],3 )
 # est_2[est_2$Variable=="LC1_2A1",c("standard_Area2022","twophase_Area2022","standard_CV_2022","twophase_CV_2022")]
-
+ft <- flextable(est_2[, c("Variable", "standard_CV_2022", "twophase_CV_2022", "cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for two-digit Land Use estimates")
+ft <- autofit(ft)
+ft
 
 # Create a formattable table with in-cell color scales and bars
 t <- formattable(
@@ -117,7 +124,7 @@ t <- formattable(
     #            style = x ~ style(font.weight = "bold", color = ifelse(abs(x) > 0.4, "red", "black")))
   )
 )
-t
+# t
 addWorksheet(wb, sheetName = "LU 2 digits")
 addStyle(wb, sheet = "LU 2 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LU 2 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)
@@ -141,7 +148,10 @@ est_2 <- est_2[,c("Variable","standard_Area2022","twophase_Area2022","area_rel_d
 # est_2[,c("standard_CV_2022","twophase_CV_2022")] <- round(est_2[,c("standard_CV_2022","twophase_CV_2022")],3 )
 # est_2[est_2$Variable=="LC1_2A1",c("standard_Area2022","twophase_Area2022","standard_CV_2022","twophase_CV_2022")]
 
-
+ft <- flextable(est_2[, c("Variable", "standard_CV_2022", "twophase_CV_2022", "cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for three-digit Land Cover estimates")
+ft <- autofit(ft)
+ft
 
 # Create a formattable table with in-cell color scales and bars
 t <- formattable(
@@ -156,7 +166,7 @@ t <- formattable(
     #            style = x ~ style(font.weight = "bold", color = ifelse(abs(x) > 0.4, "red", "black")))
   )
 )
-t
+# t
 addWorksheet(wb, sheetName = "LC 3 digits")
 addStyle(wb, sheet = "LC 3 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LC 3 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)
@@ -180,7 +190,10 @@ est_2 <- est_2[,c("Variable","standard_Area2022","twophase_Area2022","area_rel_d
 # est_2[,c("standard_CV_2022","twophase_CV_2022")] <- round(est_2[,c("standard_CV_2022","twophase_CV_2022")],3 )
 # est_2[est_2$Variable=="LC1_2A1",c("standard_Area2022","twophase_Area2022","standard_CV_2022","twophase_CV_2022")]
 
-
+ft <- flextable(est_2[, c("Variable", "standard_CV_2022", "twophase_CV_2022", "cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for three-digit Land Use estimates")
+ft <- autofit(ft)
+ft
 
 # Create a formattable table with in-cell color scales and bars
 t <- formattable(
@@ -195,7 +208,7 @@ t <- formattable(
     #            style = x ~ style(font.weight = "bold", color = ifelse(abs(x) > 0.4, "red", "black")))
   )
 )
-t
+# t
 addWorksheet(wb, sheetName = "LU 3 digits")
 addStyle(wb, sheet = "LU 3 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LU 3 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)
