@@ -10,6 +10,8 @@
 #        EU_structure.csv
 # Output: ./7.EU_estimates/Europe_estimates.xlsx
 #----------------------------------------------------------
+library(ReGenesees)
+library(data.table)
 options(stringsAsFactors = TRUE)
 options(scipen=100)
 if ("xlsx" %in% loadedNamespaces()){
@@ -58,6 +60,32 @@ tot2009$CI.l <- tot2009$Total - tot2009$SE * 1.96
 tot2009$CI.u <- tot2009$Total + tot2009$SE * 1.96
 colnames(tot2009)[2] <- "Area2009"
 colnames(tot2009)[3:6] <- paste0(colnames(tot2009)[3:6],"_2009")
+#-------------------------------------
+# Compute settl_pc
+pop <- read.csv("EU_population_2009_2023.csv")
+tot2009$Area2009[tot2009$Variable=="settl_pc"] <- tot2009$Area2009[tot2009$Variable=="settlement1"] / pop$Pop2009[pop$NUTS0=="EU23_2009"]
+# V=var(sett / pop ) = 1/(pop)^2 * V(sett)
+# V(sett) è l'SE restituito da Regenesees al quadrato. 
+# SE=sqrt(V)
+# CV = SE/settl_pc
+# settl_pc+-1.96*SE
+tot2009$SE_2009[tot2009$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2009[pop$NUTS0=="EU23_2009"]^2 )  * (tot2009$SE[tot2009$Variable=="settlement1"])^2 )
+tot2009$CV_2009[tot2009$Variable=="settl_pc"] <- tot2009$SE_2009[tot2009$Variable=="settl_pc"] / tot2009$Area2009[tot2009$Variable=="settl_pc"]
+tot2009$CI.l_2009[tot2009$Variable=="settl_pc"] <- tot2009$Area2009[tot2009$Variable=="settl_pc"] - 1.96 * tot2009$SE_2009[tot2009$Variable=="settl_pc"]
+tot2009$CI.u_2009[tot2009$Variable=="settl_pc"] <- tot2009$Area2009[tot2009$Variable=="settl_pc"] + 1.96 * tot2009$SE_2009[tot2009$Variable=="settl_pc"]
+tot2009[tot2009$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2009$Area2009[tot2009$Variable=="settlement1"] / (tot2009$Area2009[tot2009$Variable=="settlement0"] + tot2009$Area2009[tot2009$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2009$Area2009[tot2009$Variable=="settlement0"] + tot2009$Area2009[tot2009$Variable=="settlement1"])^2 )  * (tot2009$SE[tot2009$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2009 <- rbind(tot2009,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2009[, 2:6] <- lapply(tot2009[, 2:6], as.numeric)
+
+
 
 #-------------------------------------
 # LUCAS 2012
@@ -76,6 +104,24 @@ tot2012$CI.l <- tot2012$Total - tot2012$SE * 1.96
 tot2012$CI.u <- tot2012$Total + tot2012$SE * 1.96
 colnames(tot2012)[2] <- "Area2012"
 colnames(tot2012)[3:6] <- paste0(colnames(tot2012)[3:6],"_2012")
+#-------------------------------------
+# Compute settl_pc
+tot2012$Area2012[tot2012$Variable=="settl_pc"] <- tot2012$Area2012[tot2012$Variable=="settlement1"] / pop$Pop2012[pop$NUTS0=="EU23_2009"]
+tot2012$SE_2012[tot2012$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2012[pop$NUTS0=="EU23_2009"]^2 )  * (tot2012$SE[tot2012$Variable=="settlement1"])^2 )
+tot2012$CV_2012[tot2012$Variable=="settl_pc"] <- tot2012$SE_2012[tot2012$Variable=="settl_pc"] / tot2012$Area2012[tot2012$Variable=="settl_pc"]
+tot2012$CI.l_2012[tot2012$Variable=="settl_pc"] <- tot2012$Area2012[tot2012$Variable=="settl_pc"] - 1.96 * tot2012$SE_2012[tot2012$Variable=="settl_pc"]
+tot2012$CI.u_2012[tot2012$Variable=="settl_pc"] <- tot2012$Area2012[tot2012$Variable=="settl_pc"] + 1.96 * tot2012$SE_2012[tot2012$Variable=="settl_pc"]
+tot2012[tot2012$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2012$Area2012[tot2012$Variable=="settlement1"] / (tot2012$Area2012[tot2012$Variable=="settlement0"] + tot2012$Area2012[tot2012$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2012$Area2012[tot2012$Variable=="settlement0"] + tot2012$Area2012[tot2012$Variable=="settlement1"])^2 )  * (tot2012$SE[tot2012$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2012 <- rbind(tot2012,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2012[, 2:6] <- lapply(tot2012[, 2:6], as.numeric)
 
 #-------------------------------------
 # LUCAS 2015
@@ -95,6 +141,26 @@ tot2015$CI.u <- tot2015$Total + tot2015$SE * 1.96
 colnames(tot2015)[2] <- "Area2015"
 colnames(tot2015)[3:6] <- paste0(colnames(tot2015)[3:6],"_2015")
 #-------------------------------------
+# Compute settl_pc
+tot2015$Area2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settlement1"] / pop$Pop2015[pop$NUTS0=="EU23_2009"]
+tot2015$SE_2015[tot2015$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2015[pop$NUTS0=="EU23_2009"]^2 )  * (tot2015$SE[tot2015$Variable=="settlement1"])^2 )
+tot2015$CV_2015[tot2015$Variable=="settl_pc"] <- tot2015$SE_2015[tot2015$Variable=="settl_pc"] / tot2015$Area2015[tot2015$Variable=="settl_pc"]
+tot2015$CI.l_2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settl_pc"] - 1.96 * tot2015$SE_2015[tot2015$Variable=="settl_pc"]
+tot2015$CI.u_2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settl_pc"] + 1.96 * tot2015$SE_2015[tot2015$Variable=="settl_pc"]
+tot2015[tot2015$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2015$Area2015[tot2015$Variable=="settlement1"] / (tot2015$Area2015[tot2015$Variable=="settlement0"] + tot2015$Area2015[tot2015$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2015$Area2015[tot2015$Variable=="settlement0"] + tot2015$Area2015[tot2015$Variable=="settlement1"])^2 )  * (tot2015$SE[tot2015$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2015 <- rbind(tot2015,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2015[, 2:6] <- lapply(tot2015[, 2:6], as.numeric)
+
+
+#-------------------------------------
 # LUCAS 2018
 #-------------------------------------
 path_input <- "./estimates2018/"
@@ -111,6 +177,25 @@ tot2018$CI.l <- tot2018$Total - tot2018$SE * 1.96
 tot2018$CI.u <- tot2018$Total + tot2018$SE * 1.96
 colnames(tot2018)[2] <- "Area2018"
 colnames(tot2018)[3:6] <- paste0(colnames(tot2018)[3:6],"_2018")
+#-------------------------------------
+# Compute settl_pc
+tot2018$Area2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settlement1"] / pop$Pop2018[pop$NUTS0=="EU23_2009"]
+tot2018$SE_2018[tot2018$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2018[pop$NUTS0=="EU23_2009"]^2 )  * (tot2018$SE[tot2018$Variable=="settlement1"])^2 )
+tot2018$CV_2018[tot2018$Variable=="settl_pc"] <- tot2018$SE_2018[tot2018$Variable=="settl_pc"] / tot2018$Area2018[tot2018$Variable=="settl_pc"]
+tot2018$CI.l_2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settl_pc"] - 1.96 * tot2018$SE_2018[tot2018$Variable=="settl_pc"]
+tot2018$CI.u_2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settl_pc"] + 1.96 * tot2018$SE_2018[tot2018$Variable=="settl_pc"]
+tot2018[tot2018$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2018$Area2018[tot2018$Variable=="settlement1"] / (tot2018$Area2018[tot2018$Variable=="settlement0"] + tot2018$Area2018[tot2018$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2018$Area2018[tot2018$Variable=="settlement0"] + tot2018$Area2018[tot2018$Variable=="settlement1"])^2 )  * (tot2018$SE[tot2018$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2018 <- rbind(tot2018,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2018[, 2:6] <- lapply(tot2018[, 2:6], as.numeric)
+
 
 #-------------------------------------
 # LUCAS 2022
@@ -121,7 +206,6 @@ for (k in EU22) {
   country <- country[,c(1:3)]
   est <- rbind(est,country)
 }
-
 tot2022 <- aggregate(cbind(Total,SE)~Variable,data=est,FUN=sum)
 tot2022$Variable <- gsub("SURVEY_","",tot2022$Variable)
 tot2022$CV <- tot2022$SE / tot2022$Total
@@ -129,6 +213,25 @@ tot2022$CI.l <- tot2022$Total - tot2022$SE * 1.96
 tot2022$CI.u <- tot2022$Total + tot2022$SE * 1.96
 colnames(tot2022)[2] <- "Area2022"
 colnames(tot2022)[3:6] <- paste0(colnames(tot2022)[3:6],"_2022")
+#-------------------------------------
+# Compute settl_pc
+tot2022$Area2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settlement1"] / pop$Pop2023[pop$NUTS0=="EU23_2009"]
+tot2022$SE_2022[tot2022$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2023[pop$NUTS0=="EU23_2009"]^2 )  * (tot2022$SE[tot2022$Variable=="settlement1"])^2 )
+tot2022$CV_2022[tot2022$Variable=="settl_pc"] <- tot2022$SE_2022[tot2022$Variable=="settl_pc"] / tot2022$Area2022[tot2022$Variable=="settl_pc"]
+tot2022$CI.l_2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settl_pc"] - 1.96 * tot2022$SE_2022[tot2022$Variable=="settl_pc"]
+tot2022$CI.u_2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settl_pc"] + 1.96 * tot2022$SE_2022[tot2022$Variable=="settl_pc"]
+tot2022[tot2022$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2022$Area2022[tot2022$Variable=="settlement1"] / (tot2022$Area2022[tot2022$Variable=="settlement0"] + tot2022$Area2022[tot2022$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2022$Area2022[tot2022$Variable=="settlement0"] + tot2022$Area2022[tot2022$Variable=="settlement1"])^2 )  * (tot2022$SE[tot2022$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2022 <- rbind(tot2022,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2022[, 2:6] <- lapply(tot2022[, 2:6], as.numeric)
+
 
 tot22 <- merge(tot2009,tot2012,by="Variable",all.x=TRUE,all.y=TRUE)
 tot22 <- merge(tot22,tot2015,by="Variable",all.x=TRUE,all.y=TRUE)
@@ -165,6 +268,24 @@ tot2012$CI.l <- tot2012$Total - tot2012$SE * 1.96
 tot2012$CI.u <- tot2012$Total + tot2012$SE * 1.96
 colnames(tot2012)[2] <- "Area2012"
 colnames(tot2012)[3:6] <- paste0(colnames(tot2012)[3:6],"_2012")
+#-------------------------------------
+# Compute settl_pc
+tot2012$Area2012[tot2012$Variable=="settl_pc"] <- tot2012$Area2012[tot2012$Variable=="settlement1"] / pop$Pop2012[pop$NUTS0=="EU27_2012"]
+tot2012$SE_2012[tot2012$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2012[pop$NUTS0=="EU27_2012"]^2 )  * (tot2012$SE[tot2012$Variable=="settlement1"])^2 )
+tot2012$CV_2012[tot2012$Variable=="settl_pc"] <- tot2012$SE_2012[tot2012$Variable=="settl_pc"] / tot2012$Area2012[tot2012$Variable=="settl_pc"]
+tot2012$CI.l_2012[tot2012$Variable=="settl_pc"] <- tot2012$Area2012[tot2012$Variable=="settl_pc"] - 1.96 * tot2012$SE_2012[tot2012$Variable=="settl_pc"]
+tot2012$CI.u_2012[tot2012$Variable=="settl_pc"] <- tot2012$Area2012[tot2012$Variable=="settl_pc"] + 1.96 * tot2012$SE_2012[tot2012$Variable=="settl_pc"]
+tot2012[tot2012$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2012$Area2012[tot2012$Variable=="settlement1"] / (tot2012$Area2012[tot2012$Variable=="settlement0"] + tot2012$Area2012[tot2012$Variable=="settlement1"])
+settl_proportion_SE <- sqrt( (1 / (tot2012$Area2012[tot2012$Variable=="settlement0"] + tot2012$Area2012[tot2012$Variable=="settlement1"])^2 )  * (tot2012$SE[tot2012$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2012 <- rbind(tot2012,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2012[, 2:6] <- lapply(tot2012[, 2:6], as.numeric)
+
 
 #-------------------------------------
 # LUCAS 2015
@@ -184,6 +305,25 @@ tot2015$CI.u <- tot2015$Total + tot2015$SE * 1.96
 colnames(tot2015)[2] <- "Area2015"
 colnames(tot2015)[3:6] <- paste0(colnames(tot2015)[3:6],"_2015")
 #-------------------------------------
+# Compute settl_pc
+tot2015$Area2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settlement1"] / pop$Pop2015[pop$NUTS0=="EU27_2012"]
+tot2015$SE_2015[tot2015$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2015[pop$NUTS0=="EU27_2012"]^2 )  * (tot2015$SE[tot2015$Variable=="settlement1"])^2 )
+tot2015$CV_2015[tot2015$Variable=="settl_pc"] <- tot2015$SE_2015[tot2015$Variable=="settl_pc"] / tot2015$Area2015[tot2015$Variable=="settl_pc"]
+tot2015$CI.l_2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settl_pc"] - 1.96 * tot2015$SE_2015[tot2015$Variable=="settl_pc"]
+tot2015$CI.u_2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settl_pc"] + 1.96 * tot2015$SE_2015[tot2015$Variable=="settl_pc"]
+tot2015[tot2015$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2015$Area2015[tot2015$Variable=="settlement1"] / (tot2015$Area2015[tot2015$Variable=="settlement0"] + tot2015$Area2015[tot2015$Variable=="settlement1"])
+settl_proportion_SE <- sqrt( (1 / (tot2015$Area2015[tot2015$Variable=="settlement0"] + tot2015$Area2015[tot2015$Variable=="settlement1"])^2 )  * (tot2015$SE[tot2015$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2015 <- rbind(tot2015,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2015[, 2:6] <- lapply(tot2015[, 2:6], as.numeric)
+
+
+#-------------------------------------
 # LUCAS 2018
 #-------------------------------------
 path_input <- "./estimates2018/"
@@ -200,6 +340,23 @@ tot2018$CI.l <- tot2018$Total - tot2018$SE * 1.96
 tot2018$CI.u <- tot2018$Total + tot2018$SE * 1.96
 colnames(tot2018)[2] <- "Area2018"
 colnames(tot2018)[3:6] <- paste0(colnames(tot2018)[3:6],"_2018")
+#-------------------------------------
+# Compute settl_pc
+tot2018$Area2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settlement1"] / pop$Pop2018[pop$NUTS0=="EU27_2012"]
+tot2018$SE_2018[tot2018$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2018[pop$NUTS0=="EU27_2012"]^2 )  * (tot2018$SE[tot2018$Variable=="settlement1"])^2 )
+tot2018$CV_2018[tot2018$Variable=="settl_pc"] <- tot2018$SE_2018[tot2018$Variable=="settl_pc"] / tot2018$Area2018[tot2018$Variable=="settl_pc"]
+tot2018$CI.l_2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settl_pc"] - 1.96 * tot2018$SE_2018[tot2018$Variable=="settl_pc"]
+tot2018$CI.u_2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settl_pc"] + 1.96 * tot2018$SE_2018[tot2018$Variable=="settl_pc"]
+tot2018[tot2018$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2018$Area2018[tot2018$Variable=="settlement1"] / (tot2018$Area2018[tot2018$Variable=="settlement0"] + tot2018$Area2018[tot2018$Variable=="settlement1"])
+settl_proportion_SE <- sqrt( (1 / (tot2018$Area2018[tot2018$Variable=="settlement0"] + tot2018$Area2018[tot2018$Variable=="settlement1"])^2 )  * (tot2018$SE[tot2018$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2018 <- rbind(tot2018,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2018[, 2:6] <- lapply(tot2018[, 2:6], as.numeric)
 
 #-------------------------------------
 # LUCAS 2022
@@ -217,6 +374,28 @@ tot2022$CI.l <- tot2022$Total - tot2022$SE * 1.96
 tot2022$CI.u <- tot2022$Total + tot2022$SE * 1.96
 colnames(tot2022)[2] <- "Area2022"
 colnames(tot2022)[3:6] <- paste0(colnames(tot2022)[3:6],"_2022")
+#-------------------------------------
+# Compute settl_pc
+tot2022$Area2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settlement1"] / pop$Pop2023[pop$NUTS0=="EU27_2012"]
+tot2022$SE_2022[tot2022$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2023[pop$NUTS0=="EU27_2012"]^2 )  * (tot2022$SE[tot2022$Variable=="settlement1"])^2 )
+tot2022$CV_2022[tot2022$Variable=="settl_pc"] <- tot2022$SE_2022[tot2022$Variable=="settl_pc"] / tot2022$Area2022[tot2022$Variable=="settl_pc"]
+tot2022$CI.l_2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settl_pc"] - 1.96 * tot2022$SE_2022[tot2022$Variable=="settl_pc"]
+tot2022$CI.u_2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settl_pc"] + 1.96 * tot2022$SE_2022[tot2022$Variable=="settl_pc"]
+tot2022[tot2022$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2022$Area2022[tot2022$Variable=="settlement1"] / (tot2022$Area2022[tot2022$Variable=="settlement0"] + tot2022$Area2022[tot2022$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2022$Area2022[tot2022$Variable=="settlement0"] + tot2022$Area2022[tot2022$Variable=="settlement1"])^2 )  * (tot2022$SE[tot2022$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2022 <- rbind(tot2022,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2022[, 2:6] <- lapply(tot2022[, 2:6], as.numeric)
+
+
+
+
 
 tot26 <- merge(tot2012,tot2015,by="Variable",all.x=TRUE,all.y=TRUE)
 tot26 <- merge(tot26,tot2018,by="Variable",all.x=TRUE,all.y=TRUE)
@@ -224,6 +403,7 @@ tot26 <- merge(tot26,tot2022,by="Variable",all.x=TRUE,all.y=TRUE)
 
 # Write the summary to the first sheet
 writeData(wb, sheet = "Europe26", tot26)
+
 
 ##################################################################
 
@@ -253,6 +433,27 @@ tot2015$CI.u <- tot2015$Total + tot2015$SE * 1.96
 colnames(tot2015)[2] <- "Area2015"
 colnames(tot2015)[3:6] <- paste0(colnames(tot2015)[3:6],"_2015")
 #-------------------------------------
+# Compute settl_pc
+tot2015$Area2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settlement1"] / pop$Pop2015[pop$NUTS0=="EU27_2020"]
+tot2015$SE_2015[tot2015$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2015[pop$NUTS0=="EU27_2020"]^2 )  * (tot2015$SE[tot2015$Variable=="settlement1"])^2 )
+tot2015$CV_2015[tot2015$Variable=="settl_pc"] <- tot2015$SE_2015[tot2015$Variable=="settl_pc"] / tot2015$Area2015[tot2015$Variable=="settl_pc"]
+tot2015$CI.l_2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settl_pc"] - 1.96 * tot2015$SE_2015[tot2015$Variable=="settl_pc"]
+tot2015$CI.u_2015[tot2015$Variable=="settl_pc"] <- tot2015$Area2015[tot2015$Variable=="settl_pc"] + 1.96 * tot2015$SE_2015[tot2015$Variable=="settl_pc"]
+tot2015[tot2015$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2015$Area2015[tot2015$Variable=="settlement1"] / (tot2015$Area2015[tot2015$Variable=="settlement0"] + tot2015$Area2015[tot2015$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2015$Area2015[tot2015$Variable=="settlement0"] + tot2015$Area2015[tot2015$Variable=="settlement1"])^2 )  * (tot2015$SE[tot2015$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2015 <- rbind(tot2015,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2015[, 2:6] <- lapply(tot2015[, 2:6], as.numeric)
+
+
+
+#-------------------------------------
 # LUCAS 2018
 #-------------------------------------
 path_input <- "./estimates2018/"
@@ -269,6 +470,26 @@ tot2018$CI.l <- tot2018$Total - tot2018$SE * 1.96
 tot2018$CI.u <- tot2018$Total + tot2018$SE * 1.96
 colnames(tot2018)[2] <- "Area2018"
 colnames(tot2018)[3:6] <- paste0(colnames(tot2018)[3:6],"_2018")
+#-------------------------------------
+# Compute settl_pc
+tot2018$Area2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settlement1"] / pop$Pop2018[pop$NUTS0=="EU27_2020"]
+tot2018$SE_2018[tot2018$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2018[pop$NUTS0=="EU27_2020"]^2 )  * (tot2018$SE[tot2018$Variable=="settlement1"])^2 )
+tot2018$CV_2018[tot2018$Variable=="settl_pc"] <- tot2018$SE_2018[tot2018$Variable=="settl_pc"] / tot2018$Area2018[tot2018$Variable=="settl_pc"]
+tot2018$CI.l_2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settl_pc"] - 1.96 * tot2018$SE_2018[tot2018$Variable=="settl_pc"]
+tot2018$CI.u_2018[tot2018$Variable=="settl_pc"] <- tot2018$Area2018[tot2018$Variable=="settl_pc"] + 1.96 * tot2018$SE_2018[tot2018$Variable=="settl_pc"]
+tot2018[tot2018$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2018$Area2018[tot2018$Variable=="settlement1"] / (tot2018$Area2018[tot2018$Variable=="settlement0"] + tot2018$Area2018[tot2018$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2018$Area2018[tot2018$Variable=="settlement0"] + tot2018$Area2018[tot2018$Variable=="settlement1"])^2 )  * (tot2018$SE[tot2018$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2018 <- rbind(tot2018,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2018[, 2:6] <- lapply(tot2018[, 2:6], as.numeric)
+
+
 
 #-------------------------------------
 # LUCAS 2022
@@ -289,6 +510,28 @@ tot2022$CI.l <- tot2022$Total - tot2022$SE * 1.96
 tot2022$CI.u <- tot2022$Total + tot2022$SE * 1.96
 colnames(tot2022)[2] <- "Area2022"
 colnames(tot2022)[3:6] <- paste0(colnames(tot2022)[3:6],"_2022")
+#-------------------------------------
+# Compute settl_pc
+tot2022$Area2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settlement1"] / pop$Pop2023[pop$NUTS0=="EU27_2020"]
+tot2022$SE_2022[tot2022$Variable=="settl_pc"] <- sqrt( (1 / pop$Pop2023[pop$NUTS0=="EU27_2020"]^2 )  * (tot2022$SE[tot2022$Variable=="settlement1"])^2 )
+tot2022$CV_2022[tot2022$Variable=="settl_pc"] <- tot2022$SE_2022[tot2022$Variable=="settl_pc"] / tot2022$Area2022[tot2022$Variable=="settl_pc"]
+tot2022$CI.l_2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settl_pc"] - 1.96 * tot2022$SE_2022[tot2022$Variable=="settl_pc"]
+tot2022$CI.u_2022[tot2022$Variable=="settl_pc"] <- tot2022$Area2022[tot2022$Variable=="settl_pc"] + 1.96 * tot2022$SE_2022[tot2022$Variable=="settl_pc"]
+tot2022[tot2022$Variable=="settl_pc",] 
+#-------------------------------------
+# Compute settl_proportion
+settl_proportion <- tot2022$Area2022[tot2022$Variable=="settlement1"] / (tot2022$Area2022[tot2022$Variable=="settlement0"] + tot2022$Area2022[tot2022$Variable=="settlement1"])
+# V=var(sett1 / (sett0+sett1) ) = 1/(sett0+sett1)^2 * V(sett1)
+settl_proportion_SE <- sqrt( (1 / (tot2022$Area2022[tot2022$Variable=="settlement0"] + tot2022$Area2022[tot2022$Variable=="settlement1"])^2 )  * (tot2022$SE[tot2022$Variable=="settlement1"])^2 )
+settl_proportion_CV <- settl_proportion_SE / settl_proportion
+settl_proportion_CI.l <- settl_proportion - 1.96 * settl_proportion_SE
+settl_proportion_CI.u <- settl_proportion + 1.96 * settl_proportion_SE
+tot2022 <- rbind(tot2022,c("settl_proportion",settl_proportion,settl_proportion_SE,settl_proportion_CV,settl_proportion_CI.l,settl_proportion_CI.u))
+tot2022[, 2:6] <- lapply(tot2022[, 2:6], as.numeric)
+
+
+
+
 
 tot27 <- merge(tot2015,tot2018,by="Variable",all.x=TRUE,all.y=TRUE)
 tot27 <- merge(tot27,tot2022,by="Variable",all.x=TRUE,all.y=TRUE)

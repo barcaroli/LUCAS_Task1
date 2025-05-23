@@ -51,6 +51,7 @@ variables <- c("fao_class_name0",
                "lue0",
                "lue1",
                "settl_pc",
+               "settl_proportion",
                "settlement0",
                "settlement1")
 eu1 <- eu[eu$Variable %in% variables,]

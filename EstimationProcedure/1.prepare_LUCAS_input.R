@@ -11,7 +11,8 @@
 # Output: LUCAS22_corrected_complete.csv
 #----------------------------------------------------------
 library(data.table)
-s2022 <- fread("LUCAS22_corrected_v4.csv")
+library(openxlsx)
+s2022 <- fread("LUCAS22_corrected_v8.csv")
 table(s2022$SURVEY_LC1)
 #####################################################################
 # MODIFIED:
@@ -47,22 +48,86 @@ panel <- merge(panel,s2018[,c("POINT_ID","land_cover","land_use","obs_type2018")
 # load("master_complete.RData")
 # panel <- merge(panel,master[,c("POINT_ID","BCK21_R")])
 panel$ones <- 1
+# panel_A1 <- panel[substr(panel$land_cover,1,1)=="A" & substr(panel$SURVEY_LC1,1,1)!="A",]
+# panel_A2 <- panel[substr(panel$land_cover,1,2)=="A1" & substr(panel$SURVEY_LC1,1,2)!="A1",]
+# addmargins(xtabs(~substr(land_cover,1,1)+substr(SURVEY_LC1,1,1),data=panel_A1,addNA=TRUE))
+# addmargins(xtabs(~substr(land_cover,1,2)+substr(SURVEY_LC1,1,2),data=panel_A1,addNA=TRUE))
+# addmargins(xtabs(~substr(land_cover,1,1)+substr(SURVEY_LC1,1,1),data=panel_A2,addNA=TRUE))
+# addmargins(xtabs(~substr(land_cover,1,2)+substr(SURVEY_LC1,1,2),data=panel_A2,addNA=TRUE))
+
+# panel$set1 <- ifelse(panel$land_cover == "A" | panel$land_use %in% c("U210", "U220", "U221", "U222", "U223", "U224", "U225", "U226", "U227", 
+#                                                                      "U228", "U310", "U311", "U312", "U314", "U315", "U316", "U317", "U318", 
+#                                                                      "U319", "U320", "U321", "U322", "U330", "U340", "U341", "U342", "U350", 
+#                                                                      "U360", "U362", "U370"),1,0)
+# panel$set2 <- ifelse(panel$SURVEY_LC1 == "A" | panel$SURVEY_LU1 %in% c("U210", "U220", "U221", "U222", "U223", "U224", "U225", "U226", "U227", 
+#                                                                      "U228", "U310", "U311", "U312", "U314", "U315", "U316", "U317", "U318", 
+#                                                                      "U319", "U320", "U321", "U322", "U330", "U340", "U341", "U342", "U350", 
+#                                                                      "U360", "U362", "U370"),1,0)
+# 
+# xtabs(~set1+set2,data=panel)
+
 panel_A <- panel[substr(panel$land_cover,1,2)=="A1" & substr(panel$SURVEY_LC1,1,2)!="A1",]
+
 # xtabs(ones~BCK21_R+SURVEY_LC1,data=panel_A)
 panel_B <- panel_A[panel_A$obs_type2018==1 & panel_A$obs_type2022==2,]
 # xtabs(ones~BCK21_R+SURVEY_LC1,data=panel_B)
 xtabs(ones~land_cover+SURVEY_LC1,data=panel_B)
-panel_C <- panel_B[panel_B$land_cover=="A11" & panel_B$SURVEY_LC1 %in% c("A21","A22","A23"),]
-panel_D <- panel_B[panel_B$land_cover=="A12",]
+# panel_C <- panel_B[panel_B$land_cover=="A11" & panel_B$SURVEY_LC1 %in% c("A21","A22","A23"),]
+# panel_D <- panel_B[panel_B$land_cover=="A12" & panel_B$SURVEY_LC1 %in% c("A21","A22","A23"),]
+panel_C <- panel_B[panel_B$land_cover=="A11" & panel_B$SURVEY_LC1 !="A11",]
 
-xtabs(ones~land_cover+SURVEY_LC1,data=panel_C)
+panel_D <- panel_B[panel_B$land_cover=="A12" & panel_B$SURVEY_LC1 !="A12",]
+
+panel_E <- panel[panel$land_use %in% c("U210", "U220", "U221", "U222", "U223", "U224", "U225", "U226", "U227", 
+                                       "U228", "U310", "U311", "U312", "U314", "U315", "U316", "U317", "U318", 
+                                       "U319", "U320", "U321", "U322", "U330", "U340", "U341", "U342", "U350", 
+                                       "U360", "U362", "U370")
+                 & !panel$SURVEY_LU1 %in% c("U210", "U220", "U221", "U222", "U223", "U224", "U225", "U226", "U227", 
+                                          "U228", "U310", "U311", "U312", "U314", "U315", "U316", "U317", "U318", 
+                                          "U319", "U320", "U321", "U322", "U330", "U340", "U341", "U342", "U350", 
+                                          "U360", "U362", "U370"),]
+panel_F <- panel_E[panel_E$obs_type2018==1 & panel_E$obs_type2022==2,]
+
+# xtabs(~set1+set2,data=panel_C)
+# xtabs(~set1+set2,data=panel_D)
+# xtabs(~set1+set2,data=panel_F)
+
+# panel_Z <- rbind(panel_C,panel_D,panel_F)
+# panel_Z <- panel_Z[!duplicated(panel_Z$POINT_ID),]
+# xtabs(~set1+set2,data=panel_Z)
+# 
+# xtabs(ones~land_cover+SURVEY_LC1,data=panel_C)
 # xtabs(ones~land_cover+SURVEY_LC1+BCK21_R,data=panel_C)
-s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% panel_C$POINT_ID,"A11",s2022$SURVEY_LC1)
-s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% panel_D$POINT_ID,"A12",s2022$SURVEY_LC1)
+s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% panel_C$POINT_ID,panel_C$land_cover,s2022$SURVEY_LC1)
+s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% panel_D$POINT_ID,panel_D$land_cover,s2022$SURVEY_LC1)
+s2022$SURVEY_LU1 <- ifelse(s2022$POINT_ID %in% panel_F$POINT_ID,panel_F$land_use,s2022$SURVEY_LU1)
 cat("\n Number of modified observations for A11: ",nrow(panel_C),"\n")
 cat("\n Number of modified observations for A12: ",nrow(panel_D),"\n")
+cat("\n Number of modified observations for land use: ",nrow(panel_F),"\n")
 table(s2022$SURVEY_LC1)
 
+######################################################################
+# NEW IMPUTATION
+xtabs(~SURVEY_LC1,data=s2022)
+xtabs(~SURVEY_LU1,data=s2022)
+panel$flag_LC <- ifelse(nchar(as.character(panel$SURVEY_LC1)) < 3
+                        | grepl("X",panel$SURVEY_LC1)
+                        | grepl("x",panel$SURVEY_LC1),1,0)
+table(panel$flag_LC)
+to_be_imputed <- panel[panel$flag_LC==1 & panel$obs_type2018==1 & panel$obs_type2022!=1,]
+cat("\n Number of imputations (last modification):",nrow(to_be_imputed))
+table(s2022$SURVEY_LC1)
+s2022$SURVEY_LC1 <- ifelse(s2022$POINT_ID %in% to_be_imputed$POINT_ID,to_be_imputed$land_cover,s2022$SURVEY_LC1)
+xtabs(~SURVEY_LC1,data=s2022)
+xtabs(~SURVEY_LU1,data=s2022)
+
+
+######################################################################
+# New imputation of A12
+a11_12 <- read.xlsx("A11_A12_cj.xlsx",sheet = 1)
+table(a11_12$land_cover)
+s2022$SURVEY_LC1[s2022$POINT_ID %in% a11_12$POINT_ID] <- a11_12$land_cover
+xtabs(~SURVEY_LC1,data=s2022)
 ######################################################################
 
 # Assign WGT_LUCAS + STRATUM_LUCAS
@@ -97,10 +162,12 @@ s2022 <- merge(s2022,pop[,c("NUTS","Pop2023")],by.x="NUTS0_24",by.y="NUTS")
 # Assign Fao classes, settlement, LUE and LUD
 source("1a.assign_FAO_settlement_LUE_LUD.R")
 table(s2022$fao_class_name)/nrow(s2022)
+table(s2022$settlement)
 
 # Calculate settl_pc
 table(as.numeric(s2022$settlement))
-s2022$settl_pc <- (as.numeric(s2022$settlement)) * 1000 / s2022$Pop2023
+# s2022$settl_pc <- (as.numeric(s2022$settlement)) * 1000 / s2022$Pop2023
+s2022$settl_pc <- (as.numeric(s2022$settlement)) / s2022$Pop2023
 summary(s2022$settl_pc)
 
 write.table(s2022,"LUCAS22_corrected_complete.csv",sep=",",quote=F,row.names=F)
