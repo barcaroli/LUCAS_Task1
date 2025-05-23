@@ -2,6 +2,14 @@
 
 To execute the whole procedure, first you have to download from the link:
 
+https://projects.gopa-group.com/unit/gopa/lucas-statictics-production/SitePages/Home.aspx?RootFolder=%2Funit%2Fgopa%2Flucas%2Dstatictics%2Dproduction%2FShared%20Documents%2FMicro%20data%2FCorrected&FolderCTID=0x012000EA473A70070E82439A5569379EFEE84F&View=%7B4C8B3CA2%2DA1C9%2D4A87%2D8B5E%2DE84B829F3220%7D
+
+the following dataset:
+
+- LUCAS22_corrected_v8.csv
+
+from the link:
+
 https://projects.gopa-group.com/unit/gopa/lucas-statictics-production/Shared%20Documents/Forms/AllItems.aspx?RootFolder=%2Funit%2Fgopa%2Flucas%2Dstatictics%2Dproduction%2FShared%20Documents%2FMicro%20data&FolderCTID=0x012000EA473A70070E82439A5569379EFEE84F&View=%7B6242612D%2DC5AF%2D4508%2DB0CE%2DC3C197EBA942%7D
 
 the following datasets:
