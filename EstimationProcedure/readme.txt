@@ -4,7 +4,7 @@ https://projects.gopa-group.com/unit/gopa/lucas-statictics-production/Shared%20D
 
 the following datasets:
 
-- LUCAS22_corrected_v4.csv
+- LUCAS22_corrected_v8.csv
 - sample_LUCAS_2022.csv
 - areas_2015_2024.csv
 - master_complete.RData
@@ -36,6 +36,7 @@ The order of execution is:
 4.estimates_twoPhases.R
 5.attribute_cal_wgts_twophase.R
 6.all_years_estimates.R
+6b.settl_poportion.R
 7.EU_estimates.R
 8a.check_estimates_artificial.R
 8b.check_estimates_water.R
@@ -48,7 +49,7 @@ The order of execution is:
 11.render_comparisons.R
 12.TwoPhases_NA_counts.R
 
-The whole procedure can be execute in batch with the execute_procedure.bat
+The whole procedure can be executed in batch with the execute_procedure.bat
 
 
 
