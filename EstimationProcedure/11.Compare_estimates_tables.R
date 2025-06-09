@@ -19,9 +19,15 @@ if (!dir.exists(direnew1))
 
 library(formattable)
 library(openxlsx)
+library(flextable)
+library(officer)
 if ("xlsx" %in% loadedNamespaces()){
   detach("package:xlsx", unload = TRUE)
 }
+
+doc <- read_docx()
+
+
 wb <- createWorkbook()
 headerStyle <- createStyle(textDecoration = "bold",halign="center", fontSize=14,fontColour = "#FFFFFF", fgFill = "#4F81BD")
 bodyStyle <- createStyle(textDecoration = "bold", fontSize=12,fontColour = "#FFFFFF", fgFill = "#4F81BD")
@@ -86,6 +92,17 @@ t <- formattable(
   )
 )
 t
+
+ft <- flextable(est_2[, c("Variable","standard_Area2022","twophase_Area2022",
+                          "standard_CV_2022","twophase_CV_2022","cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for two-digit Land Cover estimates")
+ft <- fontsize(ft, size = 8, part = "all")
+ft <- set_table_properties(ft, layout = "fixed", width = 0.5)
+ft <- autofit(ft)
+ft
+doc <- body_add_flextable(doc, value = ft)
+print(doc, target = "compare_estimates.docx")
+
 addWorksheet(wb, sheetName = "LC 2 digits")
 addStyle(wb, sheet = "LC 2 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LC 2 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)
@@ -126,6 +143,16 @@ t <- formattable(
   )
 )
 t
+ft <- flextable(est_2[, c("Variable","standard_Area2022","twophase_Area2022",
+                          "standard_CV_2022","twophase_CV_2022","cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for two-digit Land Use estimates")
+ft <- fontsize(ft, size = 8, part = "all")
+ft <- set_table_properties(ft, layout = "fixed", width = 0.5)
+ft <- autofit(ft)
+ft
+doc <- body_add_flextable(doc, value = ft)
+print(doc, target = "compare_estimates.docx")
+
 addWorksheet(wb, sheetName = "LU 2 digits")
 addStyle(wb, sheet = "LU 2 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LU 2 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)
@@ -167,6 +194,17 @@ t <- formattable(
   )
 )
 t
+ft <- flextable(est_2[, c("Variable","standard_Area2022","twophase_Area2022",
+                          "standard_CV_2022","twophase_CV_2022","cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for three-digit Land Cover estimates")
+ft <- fontsize(ft, size = 8, part = "all")
+ft <- set_table_properties(ft, layout = "fixed", width = 0.5)
+ft <- autofit(ft)
+ft
+doc <- body_add_flextable(doc, value = ft)
+print(doc, target = "compare_estimates.docx")
+
+
 addWorksheet(wb, sheetName = "LC 3 digits")
 addStyle(wb, sheet = "LC 3 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LC 3 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)
@@ -208,6 +246,16 @@ t <- formattable(
   )
 )
 t
+ft <- flextable(est_2[, c("Variable","standard_Area2022","twophase_Area2022",
+                          "standard_CV_2022","twophase_CV_2022","cv_diff")])
+ft <- set_caption(ft, caption = "CVs comparison for three-digit Land Use estimates")
+ft <- fontsize(ft, size = 8, part = "all")
+ft <- set_table_properties(ft, layout = "fixed", width = 0.5)
+ft <- autofit(ft)
+ft
+doc <- body_add_flextable(doc, value = ft)
+print(doc, target = "compare_estimates.docx")
+
 addWorksheet(wb, sheetName = "LU 3 digits")
 addStyle(wb, sheet = "LU 3 digits", style = headerStyle, rows = 1, cols = 1:ncol(t), gridExpand = TRUE)
 addStyle(wb, sheet = "LU 3 digits", bodyStyle, rows = 2:(nrow(t)+1), cols = 1, gridExpand = TRUE)

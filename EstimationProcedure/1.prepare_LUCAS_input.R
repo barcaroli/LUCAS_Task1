@@ -124,10 +124,36 @@ xtabs(~SURVEY_LU1,data=s2022)
 
 ######################################################################
 # New imputation of A12
-a11_12 <- read.xlsx("A11_A12_cj.xlsx",sheet = 1)
-table(a11_12$land_cover)
+# a11_12 <- read.xlsx("A11_A12_cj.xlsx",sheet = 1)
+# table(a11_12$land_cover)
+# s2022$SURVEY_LC1[s2022$POINT_ID %in% a11_12$POINT_ID] <- a11_12$land_cover
+# xtabs(~SURVEY_LC1,data=s2022)
+a11_12 <-read.xlsx("A11_A12_final.xlsx")
+a11_12 <- a11_12[order(a11_12$POINT_ID),]
+addmargins(xtabs(~land_cover+NUTS0_24,data=a11_12))
+# land_cover  BE  BG  CY  CZ  DE  DK  EE  EL  FR  HR  IE  IT  NL  PL  PT  RO Sum
+#        A11  24   6   2  11  49   6   1  10  29   2   2  29   1  26   5  23 226
+#        A12   0   0   1   4  11   0   0   2   3   1   1   5  24   1   3   2  58
+#        Sum  24   6   3  15  60   6   1  12  32   3   3  34  25  27   8  25 284
+a <- s2022[s2022$POINT_ID %in% a11_12$POINT_ID,]
+addmargins(xtabs(~SURVEY_LC1+POINT_NUTS0,data=a))
+# SURVEY_LC1  BE  BG  CY  CZ  DE  DK  EE  EL  FR  HR  IE  IT  NL  PL  PT  RO Sum
+#        A11  24   6   3  15  60   5   1  12  32   3   3  34   0  27   8  25 258
+#        A12   0   0   0   0   0   1   0   0   0   0   0   0  24   0   0   0  25
+#        A30   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   1
+#        Sum  24   6   3  15  60   6   1  12  32   3   3  34  25  27   8  25 284
+a$SURVEY_LC1[a$POINT_ID %in% a$POINT_ID] <- a11_12$land_cover 
+addmargins(xtabs(~SURVEY_LC1+POINT_NUTS0,data=a))
+# SURVEY_LC1  BE  BG  CY  CZ  DE  DK  EE  EL  FR  HR  IE  IT  NL  PL  PT  RO Sum
+#        A11  24   6   2  11  49   6   1  10  29   2   2  29   1  26   5  23 226
+#        A12   0   0   1   4  11   0   0   2   3   1   1   5  24   1   3   2  58
+#        Sum  24   6   3  15  60   6   1  12  32   3   3  34  25  27   8  25 284
 s2022$SURVEY_LC1[s2022$POINT_ID %in% a11_12$POINT_ID] <- a11_12$land_cover
-xtabs(~SURVEY_LC1,data=s2022)
+addmargins(xtabs(~SURVEY_LC1+POINT_NUTS0,data=s2022[s2022$POINT_ID %in% a$POINT_ID,]))
+# SURVEY_LC1  BE  BG  CY  CZ  DE  DK  EE  EL  FR  HR  IE  IT  NL  PL  PT  RO Sum
+#        A11  24   6   2  11  49   6   1  10  29   2   2  29   1  26   5  23 226
+#        A12   0   0   1   4  11   0   0   2   3   1   1   5  24   1   3   2  58
+#        Sum  24   6   3  15  60   6   1  12  32   3   3  34  25  27   8  25 284
 ######################################################################
 
 # Assign WGT_LUCAS + STRATUM_LUCAS
