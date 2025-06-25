@@ -306,7 +306,7 @@ est_LC1_LU1_NUTS1_24_2nd = est_LC1_LU1_NUTS1_24_2nd%>%
          var = replace_na(var, "Total")) %>% 
   select(-var2, -col)%>% 
   arrange(NUTS1_24, key) %>% 
-  spread(var, value)
+  tidyr::spread(var, value)
 
 
 #import file:
@@ -321,7 +321,7 @@ colnames(est_toadd)[grep("Yes", colnames(est_toadd))] = sub(".Yes", "",colnames(
 est_toadd$key = sub("SE.", "", est_toadd$variable)
 # to long format
 est_toadd= est_toadd %>% select(-variable) %>%  pivot_longer(-key,names_to="NUTS1_24", values_to = "SE") %>% mutate(SE=as.numeric(SE))
-
+est_toadd$NUTS1_24 <- ifelse(est_toadd$NUTS1_24=="PT0","PT1",est_toadd$NUTS1_24)
 # merge
 est_LC1_LU1_NUTS1_24_2nd = merge(est_LC1_LU1_NUTS1_24_2nd, est_toadd, by=c("NUTS1_24", "key"), all.x=TRUE)
 
@@ -367,7 +367,7 @@ est_LC1_LU1_NUTS2_24_2nd = est_LC1_LU1_NUTS2_24_2nd%>%
          var = replace_na(var, "Total")) %>% 
   select(-var2, -col)%>% 
   arrange(NUTS2_24, key) %>% 
-  spread(var, value)
+  tidyr::spread(var, value)
 
 
 #import file:

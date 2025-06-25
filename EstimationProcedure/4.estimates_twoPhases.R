@@ -161,7 +161,7 @@ table(master$ELEV2,useNA="ifany")
 ##########
 
 paesi <- levels(as.factor(s2022$NUTS0_24))
-i = which(paesi=="AT")
+i = which(paesi=="PT")
 i
 # sintesi=s2022 %>% group_by(NUTS0_24) %>% summarise(nlevel_nuts1=length(unique(NUTS1_24)), nlevel_nuts2=length(unique(NUTS2_24)))
 
